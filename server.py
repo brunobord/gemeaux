@@ -2,18 +2,26 @@ import sys
 import time
 from itertools import chain
 from os import listdir
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, isdir, isfile, join
 from socket import AF_INET, SOCK_STREAM, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
 from urllib.parse import urlparse
 
 
-class NoIndexDirectory(Exception):
-    def __init__(self, *args, **kwargs):
-        self.filepath = kwargs.pop("filepath")
-        super().__init__(*args, **kwargs)
+# ############## Exceptions
+class ImproperlyConfigured(Exception):
+    """
+    When the configuration is a problem
+    """
 
 
+class FlushResponse(Exception):
+    """
+    Triggers the response flushing
+    """
+
+
+# ############## Reponses
 class Response:
     """
     Basic Gemini response
@@ -69,20 +77,16 @@ class DocumentResponse(Response):
     This reponse is the content a text document.
     """
 
-    def __init__(self, filename, directory, directory_listing=True):
+    def __init__(self, full_path, root_dir):
         """
         Open the document and read its content
         """
-        filepath = abspath(join(directory, filename))
-        if not filepath.startswith(directory):
+        full_path = abspath(full_path)
+        if not full_path.startswith(root_dir):
             raise FileNotFoundError
-        if isdir(filepath):
-            filepath = join(filepath, "index.gmi")
-            if not isfile(filepath):
-                if directory_listing:
-                    raise NoIndexDirectory(filepath=dirname(filepath))
-                raise FileNotFoundError
-        with open(filepath, "rb") as fd:
+        if not isfile(full_path):
+            raise FileNotFoundError
+        with open(full_path, "rb") as fd:
             self.content = fd.read()
 
     def __body__(self):
@@ -90,18 +94,18 @@ class DocumentResponse(Response):
 
 
 class DirectoryListingResponse(Response):
-    def __init__(self, url, directory):
-
-        url_path = parse_url(url, add_index=False)
-        path = abspath(join(directory, url_path))
-        if not path.startswith(directory):
+    def __init__(self, full_path, root_dir):
+        # Just in case
+        full_path = abspath(full_path)
+        if not full_path.startswith(root_dir):
             raise FileNotFoundError
-        if not isdir(path):
+        if not isdir(full_path):
             raise FileNotFoundError
+        relative_path = full_path[len(root_dir) :]
 
-        heading = [f"# Directory listing for `{url_path}`\r\n", "\r\n"]
-        body = listdir(path)
-        body = map(lambda x: f"=> {url_path}/{x}\r\n", body)
+        heading = [f"# Directory listing for `{relative_path}`\r\n", "\r\n"]
+        body = listdir(full_path)
+        body = map(lambda x: f"=> {relative_path}/{x}\r\n", body)
         body = chain(heading, body)
         body = map(lambda item: bytes(item, encoding="utf8"), body)
         body = list(body)
@@ -111,17 +115,54 @@ class DirectoryListingResponse(Response):
         return self.content
 
 
-def parse_url(url, add_index=True):
+# ############## Handlers
+class StaticHandler:
+    def __init__(self, static_dir, directory_listing=True, index_file="index.gmi"):
+        self.static_dir = abspath(static_dir)
+        if not isdir(self.static_dir):
+            raise ImproperlyConfigured(f"{self.static_dir} is not a directory")
+        self.directory_listing = directory_listing
+        self.index_file = index_file
+
+    def __repr__(self):
+        return f"<StaticHandler: {self.static_dir}>"
+
+    def get_response(self, url, path):
+
+        # A bit paranoid…
+        if path.startswith(url):
+            path = path[len(url) :]
+        if path.startswith("/"):  # Should be a relative path
+            path = path[1:]
+
+        full_path = join(self.static_dir, path)
+        # print(f"StaticHandler: path='{full_path}'")
+        # The path leads to a directory
+        if isdir(full_path):
+            # Directory -> index?
+            index_path = join(full_path, self.index_file)
+            if isfile(index_path):
+                return DocumentResponse(index_path, self.static_dir)
+            elif self.directory_listing:
+                return DirectoryListingResponse(full_path, self.static_dir)
+        # The path is a file
+        elif isfile(full_path):
+            return DocumentResponse(full_path, self.static_dir)
+        # Else, not found or error
+        raise FileNotFoundError
+
+    def handle(self, url, filepath):
+        response = self.get_response(url, filepath)
+        return response
+
+
+def get_path(url):
     """
-    Parse a URL and return a path
+    Parse a URL and return a path relative to the root
     """
     url = url.strip()
     parsed = urlparse(url, "gemini")
     path = parsed.path
-    if path.startswith("/"):
-        path = path[1:]
-    if add_index and path == "":
-        return "index.gmi"
     return path
 
 
@@ -135,15 +176,13 @@ class App:
         port,
         certfile,
         keyfile,
-        static_dir="static",
-        directory_listing=True,
+        urls,
     ):
         self.ip = ip
         self.port = port
-        self.static_dir = abspath(static_dir)
+        self.urls = urls
         self.context = SSLContext(PROTOCOL_TLS_SERVER)
         self.context.load_cert_chain(certfile, keyfile)
-        self.directory_listing = directory_listing
 
     def log(self, message, error=False):
         """
@@ -168,30 +207,42 @@ class App:
         self.log(message, error=(not response or response.status != 20))
 
     def mainloop(self, tls):
-        response = None
         while True:
+            response = connection = None
+            do_log = True
             try:
                 connection, (address, _) = tls.accept()
-
                 url = connection.recv(1024).decode()
+                path = get_path(url)
 
-                filepath = parse_url(url)
+                for k_url, k_value in self.urls.items():
+                    if not k_url:  # Skip the catchall
+                        continue
+                    if path.startswith(k_url):
+                        response = k_value.handle(k_url, path)
+                        raise FlushResponse
 
-                response = DocumentResponse(
-                    filepath, self.static_dir, self.directory_listing
-                )
-                connection.sendall(bytes(response))
-            except NoIndexDirectory:
-                response = DirectoryListingResponse(url, self.static_dir)
+                if "" in self.urls:
+                    # Catch all
+                    response = self.urls[""].handle("", path)
+                    raise FlushResponse
+
+                raise FileNotFoundError
+
+            except FlushResponse:
                 connection.sendall(bytes(response))
             except ConnectionResetError:
                 self.log("Connection reset by peer...")
             except FileNotFoundError:
                 response = NotFoundResponse()
                 connection.sendall(bytes(response))
+            except KeyboardInterrupt:
+                do_log = False
+                raise
             finally:
                 connection.close()
-                self.log_access(address, url, response)
+                if do_log:
+                    self.log_access(address, url, response)
 
     def run(self):
         with socket(AF_INET, SOCK_STREAM) as server:
@@ -207,8 +258,15 @@ if __name__ == "__main__":
         "port": 1965,
         "certfile": "cert.pem",
         "keyfile": "key.pem",
-        "static_dir": "examples/static",
-        "directory_listing": True,
+        "urls": {
+            "": StaticHandler(static_dir="examples/static/", directory_listing=True),
+            "/test": StaticHandler(
+                static_dir="examples/static/", directory_listing=False
+            ),
+            "/with-sub": StaticHandler(
+                static_dir="examples/static/sub-dir", directory_listing=True
+            ),
+        },
     }
     app = App(**config)
     try:
