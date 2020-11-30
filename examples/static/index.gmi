@@ -1,0 +1,34 @@
+# Hello
+
+## Title 2
+
+### Title 3
+
+
+Lorem ipsum dolor sit amet, **consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua**. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui *officia deserunt mollit anim id est laborum*.
+
+=> other.gmi Link to other.gmi
+=> gemini://localhost/other.gmi link with the gemini protocol
+
+* This is a list item
+* … and another list item
+* And the last list item!
+
+### Title 3 again
+
+```
+# code block for whichever use you want to use.
+if __name__ == '__main__':
+    config = {
+        "ip": '',
+        "port": 1965,
+        "pemfile": 'cert.pem',
+        "keyfile": 'cert.key'
+    }
+    app = App(**config)
+    try:
+        app.run()
+    except KeyboardInterrupt:
+        print("bye")
+        sys.exit()
+```

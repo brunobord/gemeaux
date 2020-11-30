@@ -207,7 +207,7 @@ if __name__ == "__main__":
         "port": 1965,
         "certfile": "cert.pem",
         "keyfile": "key.pem",
-        "static_dir": "static",
+        "static_dir": "examples/static",
         "directory_listing": True,
     }
     app = App(**config)
