@@ -3,6 +3,7 @@ from gemeaux.responses import (
     InputResponse,
     PermanentRedirectResponse,
     RedirectResponse,
+    SensitiveInputResponse,
     TextResponse,
 )
 
@@ -51,9 +52,8 @@ if __name__ == "__main__":
             # Direct response
             "/direct": TextResponse(title="Direct Response", body="I am here"),
             # Standard responses
-            # TODO: 10
             "/10": InputResponse(prompt="What's the ultimate answer?"),
-            # TODO: 11
+            "/11": SensitiveInputResponse(prompt="What's the ultimate answer?"),
             "/30": RedirectResponse(target="/hello"),
             "/31": PermanentRedirectResponse(target="/hello"),
             # TODO: 40 TEMPORARY FAILURE
@@ -69,7 +69,6 @@ if __name__ == "__main__":
             # TODO: 60 (?) CLIENT CERTIFICATE REQUIRED
             # TODO: 61 (?) CERTIFICATE NOT AUTHORISED
             # TODO: 62 (?) CERTIFICATE NOT VALID
-
             # Configration errors. Uncomment to see how they're handled
             # "error": "I am an error",
             # "error": StaticHandler(static_dir="/tmp/not-a-directory"),

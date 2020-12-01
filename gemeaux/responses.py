@@ -55,6 +55,14 @@ class InputResponse(Response):
         return bytes(meta, encoding="utf-8")
 
 
+class SensitiveInputResponse(InputResponse):
+    """
+    Sensitive Input response. Status code: 11
+    """
+
+    status = 11
+
+
 class NotFoundResponse(Response):
     """
     Not Found Error response. Status code: 51.
