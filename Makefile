@@ -8,6 +8,6 @@ cert:
 lint: isort black
 
 isort:
-	isort *.py
+	isort --profile black *.py
 black:
 	black *.py
