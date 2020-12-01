@@ -25,6 +25,7 @@ if __name__ == "__main__":
                 static_dir="examples/static/sub-dir", directory_listing=True
             ),
             "/hello": HelloWorldHandler(),
+            "/direct-response": TextResponse(title="Direct Response", body="I am here"),
         },
     }
     app = App(**config)

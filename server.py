@@ -217,9 +217,9 @@ class App:
             raise ImproperlyConfigured(f"Bad url configuration: empty dict")
 
         for k, v in urls.items():
-            if not isinstance(v, (Handler,)):
+            if not isinstance(v, (Handler, Response)):
                 raise ImproperlyConfigured(
-                    f"Bad url configuration: wrong type for `k`. It should be of type Handler"
+                    f"Bad url configuration: wrong type for `k`. It should be of type Handler or Response"
                 )
 
         self.urls = urls
@@ -248,20 +248,29 @@ class App:
         )
         self.log(message, error=(not response or response.status != 20))
 
+    def get_route(self, path):
+
+        for k_url, k_value in self.urls.items():
+            if not k_url:  # Skip the catchall
+                continue
+            if path.startswith(k_url):
+                return k_url, k_value
+
+        # Catch all
+        if "" in self.urls:
+            return "", self.urls[""]
+
+        raise FileNotFoundError
+
     def get_response(self, url):
+
         path = get_path(url)
-
+        k_url, k_value = self.get_route(path)
         try:
-            for k_url, k_value in self.urls.items():
-                if not k_url:  # Skip the catchall
-                    continue
-                if path.startswith(k_url):
-                    return k_value.handle(k_url, path)
-
-            # Catch all
-            if "" in self.urls:
-                return self.urls[""].handle("", path)
-
+            if isinstance(k_value, Handler):
+                return k_value.handle(k_url, path)
+            elif isinstance(k_value, Response):
+                return k_value
         except Exception as exc:
             self.log(f"Error: {type(exc)}", error=True)
 
