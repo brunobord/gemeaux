@@ -35,8 +35,23 @@ if __name__ == "__main__":
             # Direct response
             "/direct": TextResponse(title="Direct Response", body="I am here"),
             # Special responses
+            # TODO: 10
+            # TODO: 11
             "/30": RedirectResponse(target="/hello"),
             "/31": PermanentRedirectResponse(target="/hello"),
+            # TODO: 40 TEMPORARY FAILURE
+            # TODO: 41 SERVER UNAVAILABLE
+            # TODO: 42 (?) CGI ERROR
+            # TODO: 43 (?) PROXY ERROR
+            # TODO: 44 SLOW DOWN
+            # TODO: 50 PERMANENT FAILURE
+            # TODO: 51 NOT FOUND (already covered by other response, but nice to have)
+            # TODO: 52 GONE
+            # TODO: 53 ? PROXY REQUEST REFUSED
+            # TODO: 59 BAD REQUEST
+            # TODO: 60 (?) CLIENT CERTIFICATE REQUIRED
+            # TODO: 61 (?) CERTIFICATE NOT AUTHORISED
+            # TODO: 62 (?) CERTIFICATE NOT VALID
         },
     }
     app = App(**config)
