@@ -114,21 +114,16 @@ class App:
         # Check the urls
         if not isinstance(urls, collections.Mapping):
             # Not of the dict type
-            raise ImproperlyConfigured(
-                f"Bad url configuration: not a dict or dict-like"
-            )
+            raise ImproperlyConfigured("Bad url configuration: not a dict or dict-like")
 
         if not urls:
             # Empty dictionary or Falsy value
-            raise ImproperlyConfigured(f"Bad url configuration: empty dict")
+            raise ImproperlyConfigured("Bad url configuration: empty dict")
 
         for k, v in urls.items():
             if not isinstance(v, (Handler, Response)):
-                raise ImproperlyConfigured(
-                    (
-                        f"URL configuration: wrong type for `{k}`. Should be of type Handler or Response."
-                    )
-                )
+                msg = f"URL configuration: wrong type for `{k}`. Should be of type Handler or Response."
+                raise ImproperlyConfigured(msg)
 
         self.urls = urls
         self.context = SSLContext(PROTOCOL_TLS_SERVER)

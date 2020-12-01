@@ -22,7 +22,7 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 ## Requirements
 
 `Gemeaux` is built around **the standard Python 3 library**, so no external dependencies.  
-It has not tests right now, but it'll probably work on Python 3.6+.
+It has a few tests right now, but it'll probably work on Python 3.6+.
 
 You'll also need `openssl` to generate certificates.
 
@@ -101,7 +101,7 @@ See the example application, in the `example_app.py` file if you want to see an 
 
 This project is mostly for education purposes, although it can possibly be used through a local network, serving Gemini content. There are important steps & bugs to fix before becoming a more solid alternative to other Gemini server software.
 
-* There are no unittests.
+* There are a few unittests.
 * It has only been manually tested on Python 3.8. It should probably work on Python 3.6+.
 * The vast majority of Gemini Standard responses are not implemented.
 * The URL routeur is so basic that it won't work if you have a `/test` and `/test2` dict keys.
