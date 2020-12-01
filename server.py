@@ -65,6 +65,29 @@ class NotFoundResponse(Response):
         return b"51 NOT FOUND"
 
 
+class RedirectResponse(Response):
+    """
+    Temporary redirect. Status code: 30
+    """
+
+    status = 30
+
+    def __init__(self, target):
+        self.target = target
+
+    def __meta__(self):
+        meta = f"{self.status} {self.target}"
+        return bytes(meta, encoding="utf-8")
+
+
+class PermanentRedirectResponse(RedirectResponse):
+    """
+    Permanent redirect. Status code: 31
+    """
+
+    status = 31
+
+
 class DocumentResponse(Response):
     """
     Document response

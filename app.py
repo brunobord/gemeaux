@@ -1,4 +1,11 @@
-from server import App, Handler, StaticHandler, TextResponse
+from server import (
+    App,
+    Handler,
+    PermanentRedirectResponse,
+    RedirectResponse,
+    StaticHandler,
+    TextResponse,
+)
 
 
 class HelloWorldHandler(Handler):
@@ -25,7 +32,11 @@ if __name__ == "__main__":
                 static_dir="examples/static/sub-dir", directory_listing=True
             ),
             "/hello": HelloWorldHandler(),
-            "/direct-response": TextResponse(title="Direct Response", body="I am here"),
+            # Direct response
+            "/direct": TextResponse(title="Direct Response", body="I am here"),
+            # Special responses
+            "/30": RedirectResponse(target="/hello"),
+            "/31": PermanentRedirectResponse(target="/hello"),
         },
     }
     app = App(**config)
