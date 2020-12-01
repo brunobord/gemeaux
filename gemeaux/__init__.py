@@ -1,6 +1,7 @@
 import collections
 import sys
 import time
+from argparse import ArgumentParser
 from os.path import abspath, isdir, isfile, join
 from socket import AF_INET, SOCK_STREAM, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
@@ -77,20 +78,38 @@ def get_path(url):
     return path
 
 
+class Config:
+    def __init__(self):
+
+        parser = ArgumentParser("Gemeaux: a Python Gemini server")
+        parser.add_argument(
+            "--ip",
+            default="localhost",
+            help="IP/Host of your server — default: localhost.",
+        )
+        parser.add_argument(
+            "--port", default=1965, type=int, help="Listening port — default: 1965."
+        )
+        parser.add_argument("--certfile", default="cert.pem")
+        parser.add_argument("--keyfile", default="key.pem")
+
+        args = parser.parse_args()
+        self.ip = args.ip
+        self.port = args.port
+        self.certfile = args.certfile
+        self.keyfile = args.keyfile
+
+
 class App:
 
     TIMESTAMP_FORMAT = "%d/%b/%Y:%H:%M:%S %z"
 
-    def __init__(
-        self,
-        ip,
-        port,
-        certfile,
-        keyfile,
-        urls,
-    ):
-        self.ip = ip
-        self.port = port
+    def __init__(self, urls):
+
+        config = Config()
+
+        self.ip = config.ip
+        self.port = config.port
 
         # Check the urls
         if not isinstance(urls, collections.Mapping):
@@ -113,7 +132,7 @@ class App:
 
         self.urls = urls
         self.context = SSLContext(PROTOCOL_TLS_SERVER)
-        self.context.load_cert_chain(certfile, keyfile)
+        self.context.load_cert_chain(config.certfile, config.keyfile)
 
     def log(self, message, error=False):
         """
