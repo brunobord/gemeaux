@@ -1,15 +1,17 @@
-from server import (
-    App,
-    Handler,
+from gemeaux import App, Handler, StaticHandler
+from gemeaux.responses import (
     InputResponse,
     PermanentRedirectResponse,
     RedirectResponse,
-    StaticHandler,
     TextResponse,
 )
 
 
 class HelloWorldHandler(Handler):
+    """
+    Proof-of-concept dynamic handler
+    """
+
     def get_response(self):
         return TextResponse("Title", "Hello World!")
 
@@ -25,17 +27,30 @@ if __name__ == "__main__":
         "certfile": "cert.pem",
         "keyfile": "key.pem",
         "urls": {
-            "": StaticHandler(static_dir="examples/static/", directory_listing=True),
+            "": StaticHandler(
+                # Static pages, with directory listing
+                static_dir="examples/static/",
+                directory_listing=True,
+            ),
             "/test": StaticHandler(
-                static_dir="examples/static/", directory_listing=False
+                # Static pages, no directory listing
+                static_dir="examples/static/",
+                directory_listing=False,
             ),
             "/with-sub": StaticHandler(
-                static_dir="examples/static/sub-dir", directory_listing=True
+                # Static pages, pointing at a "deep" directory with an index.gmi file
+                static_dir="examples/static/sub-dir",
             ),
+            "/index-file": StaticHandler(
+                # Static pages, pointing at a directory with an alternate index file
+                static_dir="examples/static/empty-dir",
+                index_file="one.gmi",
+            ),
+            # Custom Handler
             "/hello": HelloWorldHandler(),
             # Direct response
             "/direct": TextResponse(title="Direct Response", body="I am here"),
-            # Special responses
+            # Standard responses
             # TODO: 10
             "/10": InputResponse(prompt="What's the ultimate answer?"),
             # TODO: 11
@@ -54,6 +69,10 @@ if __name__ == "__main__":
             # TODO: 60 (?) CLIENT CERTIFICATE REQUIRED
             # TODO: 61 (?) CERTIFICATE NOT AUTHORISED
             # TODO: 62 (?) CERTIFICATE NOT VALID
+
+            # Configration errors. Uncomment to see how they're handled
+            # "error": "I am an error",
+            # "error": StaticHandler(static_dir="/tmp/not-a-directory"),
         },
     }
     app = App(**config)
