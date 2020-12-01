@@ -1,3 +1,4 @@
+import collections
 import sys
 import time
 from itertools import chain
@@ -203,6 +204,24 @@ class App:
     ):
         self.ip = ip
         self.port = port
+
+        # Check the urls
+        if not isinstance(urls, collections.Mapping):
+            # Not of the dict type
+            raise ImproperlyConfigured(
+                f"Bad url configuration: not a dict or dict-like"
+            )
+
+        if not urls:
+            # Empty dictionary or Falsy value
+            raise ImproperlyConfigured(f"Bad url configuration: empty dict")
+
+        for k, v in urls.items():
+            if not isinstance(v, (Handler,)):
+                raise ImproperlyConfigured(
+                    f"Bad url configuration: wrong type for `k`. It should be of type Handler"
+                )
+
         self.urls = urls
         self.context = SSLContext(PROTOCOL_TLS_SERVER)
         self.context.load_cert_chain(certfile, keyfile)

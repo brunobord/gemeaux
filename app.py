@@ -1,4 +1,4 @@
-from server import App, StaticHandler, Handler, TextResponse
+from server import App, Handler, StaticHandler, TextResponse
 
 
 class HelloWorldHandler(Handler):
