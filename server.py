@@ -54,6 +54,21 @@ class Response:
         return len(bytes(self))
 
 
+class InputResponse(Response):
+    """
+    Input response. Status code: 10.
+    """
+
+    status = 10
+
+    def __init__(self, prompt):
+        self.prompt = prompt
+
+    def __meta__(self):
+        meta = f"{self.status} {self.prompt}"
+        return bytes(meta, encoding="utf-8")
+
+
 class NotFoundResponse(Response):
     """
     Not Found Error response. Status code: 51.

@@ -1,6 +1,7 @@
 from server import (
     App,
     Handler,
+    InputResponse,
     PermanentRedirectResponse,
     RedirectResponse,
     StaticHandler,
@@ -36,6 +37,7 @@ if __name__ == "__main__":
             "/direct": TextResponse(title="Direct Response", body="I am here"),
             # Special responses
             # TODO: 10
+            "/10": InputResponse(prompt="What's the ultimate answer?"),
             # TODO: 11
             "/30": RedirectResponse(target="/hello"),
             "/31": PermanentRedirectResponse(target="/hello"),
