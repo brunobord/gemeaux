@@ -15,12 +15,6 @@ class ImproperlyConfigured(Exception):
     """
 
 
-class FlushResponse(Exception):
-    """
-    Triggers the response flushing
-    """
-
-
 # ############## Reponses
 class Response:
     """
@@ -115,8 +109,37 @@ class DirectoryListingResponse(Response):
         return self.content
 
 
+class TextResponse(Response):
+    def __init__(self, title=None, body=None):
+        content = []
+        # Remove empty bodies
+        if title:
+            content.append(f"# {title}")
+            content.append("")
+        if body:
+            content.append(body)
+
+        content = map(lambda item: f"{item}\r\n", content)
+        content = map(lambda item: bytes(item, encoding="utf8"), content)
+        self.content = b"".join(content)
+
+    def __body__(self):
+        return self.content
+
+
 # ############## Handlers
-class StaticHandler:
+class Handler:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get_response(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def handle(self, url, path):
+        raise NotImplementedError
+
+
+class StaticHandler(Handler):
     def __init__(self, static_dir, directory_listing=True, index_file="index.gmi"):
         self.static_dir = abspath(static_dir)
         if not isdir(self.static_dir):
@@ -151,8 +174,8 @@ class StaticHandler:
         # Else, not found or error
         raise FileNotFoundError
 
-    def handle(self, url, filepath):
-        response = self.get_response(url, filepath)
+    def handle(self, url, path):
+        response = self.get_response(url, path)
         return response
 
 
@@ -206,41 +229,43 @@ class App:
         )
         self.log(message, error=(not response or response.status != 20))
 
+    def get_response(self, url):
+        path = get_path(url)
+
+        try:
+            for k_url, k_value in self.urls.items():
+                if not k_url:  # Skip the catchall
+                    continue
+                if path.startswith(k_url):
+                    return k_value.handle(k_url, path)
+
+            # Catch all
+            if "" in self.urls:
+                return self.urls[""].handle("", path)
+
+        except Exception as exc:
+            self.log(f"Error: {type(exc)}", error=True)
+
+        return NotFoundResponse()
+
     def mainloop(self, tls):
+        connection = response = None
         while True:
-            response = connection = None
             do_log = True
             try:
                 connection, (address, _) = tls.accept()
                 url = connection.recv(1024).decode()
-                path = get_path(url)
-
-                for k_url, k_value in self.urls.items():
-                    if not k_url:  # Skip the catchall
-                        continue
-                    if path.startswith(k_url):
-                        response = k_value.handle(k_url, path)
-                        raise FlushResponse
-
-                if "" in self.urls:
-                    # Catch all
-                    response = self.urls[""].handle("", path)
-                    raise FlushResponse
-
-                raise FileNotFoundError
-
-            except FlushResponse:
+                response = self.get_response(url)
                 connection.sendall(bytes(response))
             except ConnectionResetError:
                 self.log("Connection reset by peer...")
-            except FileNotFoundError:
-                response = NotFoundResponse()
-                connection.sendall(bytes(response))
             except KeyboardInterrupt:
                 do_log = False
-                raise
+                print("bye")
+                sys.exit()
             finally:
-                connection.close()
+                if connection:
+                    connection.close()
                 if do_log:
                     self.log_access(address, url, response)
 
@@ -250,27 +275,3 @@ class App:
             server.listen(5)
             with self.context.wrap_socket(server, server_side=True) as tls:
                 self.mainloop(tls)
-
-
-if __name__ == "__main__":
-    config = {
-        "ip": "localhost",
-        "port": 1965,
-        "certfile": "cert.pem",
-        "keyfile": "key.pem",
-        "urls": {
-            "": StaticHandler(static_dir="examples/static/", directory_listing=True),
-            "/test": StaticHandler(
-                static_dir="examples/static/", directory_listing=False
-            ),
-            "/with-sub": StaticHandler(
-                static_dir="examples/static/sub-dir", directory_listing=True
-            ),
-        },
-    }
-    app = App(**config)
-    try:
-        app.run()
-    except KeyboardInterrupt:
-        print("bye")
-        sys.exit()
