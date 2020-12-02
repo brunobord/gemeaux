@@ -29,6 +29,10 @@ class Handler:
 
 
 class StaticHandler(Handler):
+    """
+    Handler for serving static Gemini pages from a directory on your filesystem.
+    """
+
     def __init__(self, static_dir, directory_listing=True, index_file="index.gmi"):
         self.static_dir = abspath(static_dir)
         if not isdir(self.static_dir):
@@ -40,7 +44,17 @@ class StaticHandler(Handler):
         return f"<StaticHandler: {self.static_dir}>"
 
     def get_response(self, url, path):
+        """
+        Return the static page response according to the configuration & file tree.
 
+        * If the path is a file -> return DocumentResponse for this file.
+        * If the path is a directory -> search for "index_file"
+          * If index is found => DocumentResponse
+          * If not found, depending on the directory_listing arg:
+            * If activated, it'll return the DirectoryListingResponse
+            * If deactivated => raises a FileNotFoundError.
+        * If none of the cases above is satisfied, it raises a FileNotFoundError
+        """
         # A bit paranoid…
         if path.startswith(url):
             path = path[len(url) :]
@@ -64,6 +78,12 @@ class StaticHandler(Handler):
         raise FileNotFoundError
 
     def handle(self, url, path):
+        """
+        Handle the StaticHandler.
+
+        Override/write this method if you need extra processing before returning the
+        standard Response.
+        """
         response = self.get_response(url, path)
         return response
 
