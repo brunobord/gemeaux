@@ -63,17 +63,6 @@ class SensitiveInputResponse(InputResponse):
     status = 11
 
 
-class NotFoundResponse(Response):
-    """
-    Not Found Error response. Status code: 51.
-    """
-
-    status = 51
-
-    def __meta__(self):
-        return b"51 NOT FOUND"
-
-
 class RedirectResponse(Response):
     """
     Temporary redirect. Status code: 30
@@ -95,6 +84,17 @@ class PermanentRedirectResponse(RedirectResponse):
     """
 
     status = 31
+
+
+class NotFoundResponse(Response):
+    """
+    Not Found Error response. Status code: 51.
+    """
+
+    status = 51
+
+    def __meta__(self):
+        return b"51 NOT FOUND"
 
 
 class DocumentResponse(Response):
@@ -121,6 +121,13 @@ class DocumentResponse(Response):
 
 
 class DirectoryListingResponse(Response):
+    """
+    List contents of a Directory. Status code: 20
+
+    Will raise a ``FileNotFoundError`` if the path passed as an argument is not a
+    directory or if the path is not a sub-directory of the root path.
+    """
+
     def __init__(self, full_path, root_dir):
         # Just in case
         full_path = abspath(full_path)
@@ -143,6 +150,10 @@ class DirectoryListingResponse(Response):
 
 
 class TextResponse(Response):
+    """
+    Simple text response, composed of a ``title`` and a text content. Status code: 20.
+    """
+
     def __init__(self, title=None, body=None):
         content = []
         # Remove empty bodies
@@ -152,9 +163,8 @@ class TextResponse(Response):
         if body:
             content.append(body)
 
-        content = map(lambda item: f"{item}\r\n", content)
-        content = map(lambda item: bytes(item, encoding="utf8"), content)
-        self.content = b"".join(content)
+        content = "\r\n".join(content)
+        self.content = bytes(content, encoding="utf-8")
 
     def __body__(self):
         return self.content
