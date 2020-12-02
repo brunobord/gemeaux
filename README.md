@@ -33,7 +33,7 @@ You'll also need `openssl` to generate certificates.
 To install `gemeaux` package, inside a virtualenv, or in a safe environment, run the following:
 
 ```sh
-git clone <url of this repository>.git
+git clone https://github.com/brunobord/gemeaux.git
 cd gemeaux/
 pip install -e .
 ```
@@ -59,7 +59,12 @@ For example, the `index.gmi` can look like this:
 ```
 # Hello World!
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.
 ```
 
 Then you'll create a python file (e.g.: `app.py`) containing the following:
@@ -108,6 +113,7 @@ This project is mostly for education purposes, although it can possibly be used 
 * The vast majority of Gemini Standard responses are not implemented.
 * The URL routeur is so basic that it won't work if you have a `/test` and `/test2` dict keys.
 * The Handler & Response documentation is to be written, along with docstrings.
+* Only `text/gemini` responses are handled ; other mimetypes would need to be implemented.
 * Performances are probably very low, there might be room for optimisation.
 
 ----
