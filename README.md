@@ -23,8 +23,9 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 
 ## Requirements
 
-`Gemeaux` is built around **the standard Python 3 library**, so no external dependencies.  
-It has a few tests right now, but it'll probably work on Python 3.6+.
+`Gemeaux` is built around **the standard Python 3.6+ library** and syntax. There are **no external dependencies**.
+
+Automated tests are launched using Python 3.6, 3.7 and 3.8, so the internals of `Gemeaux` are safe with these versions of Python.
 
 You'll also need `openssl` to generate certificates.
 
@@ -108,11 +109,10 @@ See the example application, in the `example_app.py` file if you want to see an 
 
 This project is mostly for education purposes, although it can possibly be used through a local network, serving Gemini content. There are important steps & bugs to fix before becoming a more solid alternative to other Gemini server software.
 
-* There are a few unittests.
-* It has only been manually tested on Python 3.8. It should probably work on Python 3.6+.
+* The internals of `Gemeaux` are being tested on Python3.6+, but not the mainloop mechanics.
 * The vast majority of Gemini Standard responses are not implemented.
 * The URL routeur is so basic that it won't work if you have a `/test` and `/test2` dict keys.
-* The Handler & Response documentation is to be written, along with docstrings.
+* The Handler & Response documentation is missing, along with docstrings.
 * Only `text/gemini` responses are handled ; other mimetypes would need to be implemented.
 * Performances are probably very low, there might be room for optimisation.
 
