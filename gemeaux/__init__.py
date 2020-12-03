@@ -120,6 +120,11 @@ class Config:
         self.keyfile = args.keyfile
 
 
+BANNER = """
+♊ Welcome to your Gémeaux server ♊
+"""
+
+
 class App:
 
     TIMESTAMP_FORMAT = "%d/%b/%Y:%H:%M:%S %z"
@@ -224,5 +229,7 @@ class App:
         with socket(AF_INET, SOCK_STREAM) as server:
             server.bind((self.ip, self.port))
             server.listen(5)
+            print(BANNER)
             with self.context.wrap_socket(server, server_side=True) as tls:
+                print(f"Application started…, listening to {self.ip}:{self.port}")
                 self.mainloop(tls)
