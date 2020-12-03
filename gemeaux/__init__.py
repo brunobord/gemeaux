@@ -45,12 +45,19 @@ class Config:
         )
         parser.add_argument("--certfile", default="cert.pem")
         parser.add_argument("--keyfile", default="key.pem")
+        parser.add_argument(
+            "--nb-connections",
+            default=5,
+            type=int,
+            help="Maximum number of connections — default: 5",
+        )
 
         args = parser.parse_args()
         self.ip = args.ip
         self.port = args.port
         self.certfile = args.certfile
         self.keyfile = args.keyfile
+        self.nb_connections = args.nb_connections
 
 
 BANNER = """
@@ -169,17 +176,15 @@ class App:
         """
         # Loading config only at runtime, not initialization
         config = Config()
-        ip = config.ip
-        port = config.port
         context = SSLContext(PROTOCOL_TLS_SERVER)
         context.load_cert_chain(config.certfile, config.keyfile)
 
         with socket(AF_INET, SOCK_STREAM) as server:
-            server.bind((ip, port))
-            server.listen(5)
+            server.bind((config.ip, config.port))
+            server.listen(config.nb_connections)
             print(BANNER)
             with context.wrap_socket(server, server_side=True) as tls:
-                print(f"Application started…, listening to {ip}:{port}")
+                print(f"Application started…, listening to {config.ip}:{config.port}")
                 self.mainloop(tls)
 
 
