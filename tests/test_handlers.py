@@ -1,6 +1,7 @@
 import pytest
 
-from gemeaux import ImproperlyConfigured, StaticHandler
+from gemeaux.exceptions import ImproperlyConfigured
+from gemeaux.handlers import StaticHandler
 from gemeaux.responses import DirectoryListingResponse, DocumentResponse
 
 # Same as in conftest.py, but can't import it

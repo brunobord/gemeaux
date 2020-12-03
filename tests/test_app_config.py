@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from gemeaux import App, ImproperlyConfigured
+from gemeaux import App
+from gemeaux.exceptions import ImproperlyConfigured
 
 
 def test_no_urls():

@@ -1,4 +1,5 @@
-from gemeaux import App, Handler, StaticHandler
+from gemeaux import App
+from gemeaux.handlers import Handler, StaticHandler
 from gemeaux.responses import (
     InputResponse,
     NotFoundResponse,
