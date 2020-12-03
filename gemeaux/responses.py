@@ -1,6 +1,9 @@
 from itertools import chain
 from os import listdir
 from os.path import abspath, isdir, isfile
+from string import Template
+
+from .exceptions import TemplateError
 
 
 class Response:
@@ -84,6 +87,23 @@ class PermanentRedirectResponse(RedirectResponse):
     """
 
     status = 31
+
+
+class PermanentFailureResponse(Response):
+    """
+    Permanent Failure response. Status code: 50.
+    """
+
+    status = 50
+
+    def __init__(self, reason=None):
+        if not reason:
+            reason = "PERMANENT FAILURE"
+        self.reason = reason
+
+    def __meta__(self):
+        meta = f"{self.status} {self.reason}"
+        return bytes(meta, encoding="utf-8")
 
 
 class NotFoundResponse(Response):
@@ -174,3 +194,23 @@ class TextResponse(Response):
 
     def __body__(self):
         return self.content
+
+
+class TemplateResponse(Response):
+    """
+    Template Response. Uses the stdlib Template engine to render Gemini content.
+    """
+
+    def __init__(self, template_file, **context):
+        if not isfile(template_file):
+            raise TemplateError(f"Template file not found: `{template_file}`")
+        with open(template_file, "r") as fd:
+            self.template = Template(fd.read())
+        self.context = context
+
+    def __body__(self):
+        try:
+            body = self.template.substitute(self.context)
+            return bytes(body, encoding="utf-8")
+        except KeyError as exc:
+            raise TemplateError(exc.args[0])

@@ -2,7 +2,7 @@
 
 ## master (unreleased)
 
-Nothing new here yet.
+* Added `TemplateResponse` & `TemplateHandler` classes for generating Gemini content using template files.
 
 ## v0.0.1 (2020-12-04)
 

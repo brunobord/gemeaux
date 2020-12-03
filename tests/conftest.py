@@ -1,6 +1,6 @@
 import pytest
 
-from gemeaux import Handler, Response
+from gemeaux import Handler, Response, TemplateResponse
 
 
 class FakeResponse(Response):
@@ -38,7 +38,7 @@ OTHER_CONTENT = """# Title\r\nI am the content of other"""
 SUB_CONTENT = """# Title\r\nI am the content of sub"""
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def index_directory(tmpdir_factory):
     p = tmpdir_factory.mktemp("var")
     # Create index file
@@ -53,3 +53,15 @@ def index_directory(tmpdir_factory):
 
     # Return directory
     return p
+
+
+class FakeTemplateResponse(TemplateResponse):
+    pass
+
+
+@pytest.fixture()
+def template_file(tmpdir_factory):
+    p = tmpdir_factory.mktemp("templates")
+    pp = p.join("template.txt")
+    pp.write_text("First var: $var1 / Second var: $var2", encoding="utf-8")
+    return pp

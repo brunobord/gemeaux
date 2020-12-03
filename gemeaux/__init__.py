@@ -6,17 +6,19 @@ from socket import AF_INET, SOCK_STREAM, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
 from urllib.parse import urlparse
 
-from .exceptions import ImproperlyConfigured
-from .handlers import Handler, StaticHandler
+from .exceptions import ImproperlyConfigured, TemplateError
+from .handlers import Handler, StaticHandler, TemplateHandler
 from .responses import (
     DirectoryListingResponse,
     DocumentResponse,
     InputResponse,
     NotFoundResponse,
+    PermanentFailureResponse,
     PermanentRedirectResponse,
     RedirectResponse,
     Response,
     SensitiveInputResponse,
+    TemplateResponse,
     TextResponse,
 )
 
@@ -139,6 +141,10 @@ class App:
                 return k_value.handle(k_url, path)
             elif isinstance(k_value, Response):
                 return k_value
+        except TemplateError as exc:
+            if exc.args:
+                reason = exc.args[0]
+            return PermanentFailureResponse(reason)
         except Exception as exc:
             if exc.args:
                 reason = exc.args[0]
@@ -193,18 +199,22 @@ __all__ = [
     "App",
     # Exceptions
     "ImproperlyConfigured",
+    "TemplateError",
     # Handlers
     "Handler",
     "StaticHandler",
+    "TemplateHandler",
     # Responses
     "Response",
     "InputResponse",
     "SensitiveInputResponse",
     "RedirectResponse",
     "PermanentRedirectResponse",
+    "PermanentFailureResponse",
     "NotFoundResponse",
     # Advanced responses
     "DocumentResponse",
     "DirectoryListingResponse",
     "TextResponse",
+    "TemplateResponse",
 ]

@@ -1,0 +1,1 @@
+I am a template file. Refresh me to see what time it is: $datetime

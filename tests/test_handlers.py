@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from gemeaux import (
@@ -5,6 +7,8 @@ from gemeaux import (
     DocumentResponse,
     ImproperlyConfigured,
     StaticHandler,
+    TemplateHandler,
+    TemplateResponse,
 )
 
 # Same as in conftest.py, but can't import it
@@ -125,3 +129,36 @@ def test_static_handler_alternate_index_no_dirlist(index_directory):
     # Subdir -> no other.gmi -> no directory listing
     with pytest.raises(FileNotFoundError):
         response = handler.get_response("", "/subdir/")
+
+
+def test_template_handler_getter(template_file):
+    class TemplateHandlerWithGetter(TemplateHandler):
+        def get_context(self, *args, **kwargs):
+            return {"var1": date.today(), "var2": "hello"}
+
+        def get_template_file(self):
+            return template_file
+
+    handler = TemplateHandlerWithGetter()
+    response = handler.get_response("", "/")
+
+    assert isinstance(response, TemplateResponse)
+    assert response.status == 20
+    expected_body = f"First var: {date.today()} / Second var: hello"
+    assert response.__body__().startswith(bytes(expected_body, encoding="utf-8"))
+
+
+def test_template_handler_classattr(template_file):
+    class TemplateHandlerWithClassattr(TemplateHandler):
+        def get_context(self, *args, **kwargs):
+            return {"var1": date.today(), "var2": "hello"}
+
+    TemplateHandlerWithClassattr.template_file = template_file
+
+    handler = TemplateHandlerWithClassattr()
+    response = handler.get_response("", "/")
+
+    assert isinstance(response, TemplateResponse)
+    assert response.status == 20
+    expected_body = f"First var: {date.today()} / Second var: hello"
+    assert response.__body__().startswith(bytes(expected_body, encoding="utf-8"))

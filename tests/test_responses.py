@@ -5,10 +5,13 @@ from gemeaux import (
     DocumentResponse,
     InputResponse,
     NotFoundResponse,
+    PermanentFailureResponse,
     PermanentRedirectResponse,
     RedirectResponse,
     Response,
     SensitiveInputResponse,
+    TemplateError,
+    TemplateResponse,
     TextResponse,
 )
 
@@ -52,6 +55,20 @@ def test_permanent_redirect_response():
     assert response.status == 31
     assert response.__body__() is None
     assert bytes(response) == b"31 gemini://localhost/\r\n"
+
+
+def test_permanent_failure_response():
+    response = PermanentFailureResponse()
+    assert response.status == 50
+    assert response.__body__() is None
+    assert bytes(response) == b"50 PERMANENT FAILURE\r\n"
+
+
+def test_permanent_failure_response_reason():
+    response = PermanentFailureResponse(reason="This resource is broken")
+    assert response.status == 50
+    assert response.__body__() is None
+    assert bytes(response) == b"50 This resource is broken\r\n"
 
 
 def test_not_found_response():
@@ -153,3 +170,36 @@ def test_text_response():
         b"\r\n"  # Linefeed
         b"My body\r\n"  # Body
     )
+
+
+def test_template_response(template_file):
+    response = TemplateResponse(template_file, **{"var1": "value1", "var2": "value2"})
+    assert response.status == 20
+    assert response.__body__() == b"First var: value1 / Second var: value2"
+
+    response = TemplateResponse(
+        template_file, **{"var1": "value1", "var2": "value2", "var_other": "other"}
+    )
+    assert response.status == 20
+    assert response.__body__() == b"First var: value1 / Second var: value2"
+
+
+def test_template_response_wrong_context(template_file):
+    # Empty context
+    response = TemplateResponse(template_file)
+    with pytest.raises(TemplateError):
+        bytes(response)
+
+    # Incomplete context
+    response = TemplateResponse(template_file, **{"var1": "value1"})
+    with pytest.raises(TemplateError):
+        bytes(response)
+
+
+def test_template_response_not_a_template():
+    with pytest.raises(TemplateError):
+        TemplateResponse("/tmp/not-a-template")
+    try:
+        TemplateResponse("/tmp/not-a-template")
+    except Exception as exc:
+        assert exc.args == ("Template file not found: `/tmp/not-a-template`",)

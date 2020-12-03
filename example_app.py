@@ -1,3 +1,5 @@
+import datetime
+
 from gemeaux import (
     App,
     Handler,
@@ -7,6 +9,8 @@ from gemeaux import (
     RedirectResponse,
     SensitiveInputResponse,
     StaticHandler,
+    TemplateHandler,
+    TemplateResponse,
     TextResponse,
 )
 
@@ -22,6 +26,13 @@ class HelloWorldHandler(Handler):
     def handle(self, url, path):
         response = self.get_response()
         return response
+
+
+class DatetimeTemplateHandler(TemplateHandler):
+    template_file = "examples/templates/template.txt"
+
+    def get_context(self, *args, **kwargs):
+        return {"datetime": datetime.datetime.now()}
 
 
 if __name__ == "__main__":
@@ -47,8 +58,13 @@ if __name__ == "__main__":
         ),
         # Custom Handler
         "/hello": HelloWorldHandler(),
+        "/template": DatetimeTemplateHandler(),
         # Direct response
         "/direct": TextResponse(title="Direct Response", body="I am here"),
+        "/template-response": TemplateResponse(
+            template_file="examples/templates/template.txt",
+            datetime="Not the dynamic datetime you were expecting",
+        ),
         # Standard responses
         "/10": InputResponse(prompt="What's the ultimate answer?"),
         "/11": SensitiveInputResponse(prompt="What's the ultimate answer?"),

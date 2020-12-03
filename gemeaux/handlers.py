@@ -1,7 +1,7 @@
 from os.path import abspath, isdir, isfile, join
 
 from .exceptions import ImproperlyConfigured
-from .responses import DirectoryListingResponse, DocumentResponse
+from .responses import DirectoryListingResponse, DocumentResponse, TemplateResponse
 
 
 class Handler:
@@ -12,7 +12,14 @@ class Handler:
         raise NotImplementedError
 
     def handle(self, url, path):
-        raise NotImplementedError
+        """
+        Handle the request to return the appropriate response.
+
+        Override/write this method if you need extra processing before returning the
+        standard Response.
+        """
+        response = self.get_response(url, path)
+        return response
 
 
 class StaticHandler(Handler):
@@ -64,12 +71,37 @@ class StaticHandler(Handler):
         # Else, not found or error
         raise FileNotFoundError("Path not found")
 
-    def handle(self, url, path):
-        """
-        Handle the StaticHandler.
 
-        Override/write this method if you need extra processing before returning the
-        standard Response.
+class TemplateHandler(Handler):
+    """
+    Template Handler
+    """
+
+    template_file = None
+
+    def get_response(self, url, path):
         """
-        response = self.get_response(url, path)
-        return response
+        Feeds the context variable into the template file to return dynamic content.
+        """
+        context = self.get_context()
+        return TemplateResponse(self.get_template_file(), **context)
+
+    def get_context(self):
+        """
+        Return a dictionary containing context variables to inject into the template.
+
+        Override this method to inject your dynamic content.
+        """
+        return {}
+
+    def get_template_file(self):
+        """
+        Return the path to the template file to use with the `TemplateResponse`.
+
+        You can either define a `template_file` class property or overwrite this method to return the appropriate template.
+        """
+        if self.template_file:
+            return self.template_file
+        raise NotImplementedError(
+            "Implement a `get_template_file` method or define a `template_file` class attribute"
+        )
