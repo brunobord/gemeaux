@@ -103,11 +103,18 @@ class App:
 
     def get_route(self, path):
 
+        matching = []
+
         for k_url, k_value in self.urls.items():
             if not k_url:  # Skip the catchall
                 continue
             if path.startswith(k_url):
-                return k_url, k_value
+                matching.append(k_url)
+
+        # One match or more. We'll take the "biggest" match.
+        if len(matching) >= 1:
+            k_url = max(matching, key=len)
+            return (k_url, self.urls[k_url])
 
         # Catch all
         if "" in self.urls:
