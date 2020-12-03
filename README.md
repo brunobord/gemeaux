@@ -93,7 +93,17 @@ python app.py
 
 You can then point your client at `gemini://localhost/` and you'll see the content of your home page.
 
-By default, the application will listen at port `1965` on your `localhost` (`127.0.0.1`) host, and will use the previously generated `cert.pem` and `key.pem` files. You can change these default using the optional arguments. For more details, run:
+By default, the application will listen at port `1965` on your `localhost` (`127.0.0.1`) host, and will use the previously generated `cert.pem` and `key.pem` files.
+
+In order to open your server to "the world", you can change the `--ip` option like this:
+
+```sh
+python app.py --ip 0.0.0.0
+```
+
+**BIG WARNING**: opening your server to external connections is **DEFINITELY NOT A GOOD IDEA**, since this software **IS NOT PRODUCTION-READY**.
+
+You can change these default options using the optional arguments. For more details, run:
 
 ```sh
 python app.py --help
