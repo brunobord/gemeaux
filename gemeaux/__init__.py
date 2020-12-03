@@ -75,7 +75,7 @@ class StaticHandler(Handler):
         elif isfile(full_path):
             return DocumentResponse(full_path, self.static_dir)
         # Else, not found or error
-        raise FileNotFoundError
+        raise FileNotFoundError("Path not found")
 
     def handle(self, url, path):
         """
@@ -180,21 +180,24 @@ class App:
         if "" in self.urls:
             return "", self.urls[""]
 
-        raise FileNotFoundError
+        raise FileNotFoundError("Route Not Found")
 
     def get_response(self, url):
 
         path = get_path(url)
-        k_url, k_value = self.get_route(path)
+        reason = None
         try:
+            k_url, k_value = self.get_route(path)
             if isinstance(k_value, Handler):
                 return k_value.handle(k_url, path)
             elif isinstance(k_value, Response):
                 return k_value
         except Exception as exc:
-            self.log(f"Error: {type(exc)}", error=True)
+            if exc.args:
+                reason = exc.args[0]
+            self.log(f"Error: {type(exc)} / {reason}", error=True)
 
-        return NotFoundResponse()
+        return NotFoundResponse(reason)
 
     def mainloop(self, tls):
         connection = response = None

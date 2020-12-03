@@ -93,8 +93,14 @@ class NotFoundResponse(Response):
 
     status = 51
 
+    def __init__(self, reason=None):
+        if not reason:
+            reason = "NOT FOUND"
+        self.reason = reason
+
     def __meta__(self):
-        return b"51 NOT FOUND"
+        meta = f"{self.status} {self.reason}"
+        return bytes(meta, encoding="utf-8")
 
 
 class DocumentResponse(Response):
@@ -110,7 +116,7 @@ class DocumentResponse(Response):
         """
         full_path = abspath(full_path)
         if not full_path.startswith(root_dir):
-            raise FileNotFoundError
+            raise FileNotFoundError("Forbidden path")
         if not isfile(full_path):
             raise FileNotFoundError
         with open(full_path, "rb") as fd:
@@ -132,7 +138,7 @@ class DirectoryListingResponse(Response):
         # Just in case
         full_path = abspath(full_path)
         if not full_path.startswith(root_dir):
-            raise FileNotFoundError
+            raise FileNotFoundError("Forbidden path")
         if not isdir(full_path):
             raise FileNotFoundError
         relative_path = full_path[len(root_dir) :]

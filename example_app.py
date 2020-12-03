@@ -1,6 +1,7 @@
 from gemeaux import App, Handler, StaticHandler
 from gemeaux.responses import (
     InputResponse,
+    NotFoundResponse,
     PermanentRedirectResponse,
     RedirectResponse,
     SensitiveInputResponse,
@@ -58,6 +59,7 @@ if __name__ == "__main__":
         # TODO: 44 SLOW DOWN
         # TODO: 50 PERMANENT FAILURE
         # TODO: 51 NOT FOUND (already covered by other response, but nice to have)
+        "/51": NotFoundResponse("Nobody will escape the Area 51"),
         # TODO: 52 GONE
         # TODO: 53 ? PROXY REQUEST REFUSED
         # TODO: 59 BAD REQUEST

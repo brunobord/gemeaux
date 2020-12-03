@@ -61,6 +61,13 @@ def test_not_found_response():
     assert bytes(response) == b"51 NOT FOUND\r\n"
 
 
+def test_not_found_response_reason():
+    response = NotFoundResponse(reason="The document is unreadable")
+    assert response.status == 51
+    assert response.__body__() is None
+    assert bytes(response) == b"51 The document is unreadable\r\n"
+
+
 def test_document_response(index_directory):
     response = DocumentResponse(
         index_directory.join("index.gmi").strpath, index_directory.strpath
