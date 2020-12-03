@@ -130,12 +130,6 @@ class App:
     TIMESTAMP_FORMAT = "%d/%b/%Y:%H:%M:%S %z"
 
     def __init__(self, urls):
-
-        config = Config()
-
-        self.ip = config.ip
-        self.port = config.port
-
         # Check the urls
         if not isinstance(urls, collections.Mapping):
             # Not of the dict type
@@ -151,8 +145,6 @@ class App:
                 raise ImproperlyConfigured(msg)
 
         self.urls = urls
-        self.context = SSLContext(PROTOCOL_TLS_SERVER)
-        self.context.load_cert_chain(config.certfile, config.keyfile)
 
     def log(self, message, error=False):
         """
@@ -226,10 +218,23 @@ class App:
                     self.log_access(address, url, response)
 
     def run(self):
+        """
+        Main run function.
+
+        Load the configuration from the command line args.
+        Launch the server
+        """
+        # Loading config only at runtime, not initialization
+        config = Config()
+        ip = config.ip
+        port = config.port
+        context = SSLContext(PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(config.certfile, config.keyfile)
+
         with socket(AF_INET, SOCK_STREAM) as server:
-            server.bind((self.ip, self.port))
+            server.bind((ip, port))
             server.listen(5)
             print(BANNER)
-            with self.context.wrap_socket(server, server_side=True) as tls:
-                print(f"Application started…, listening to {self.ip}:{self.port}")
+            with context.wrap_socket(server, server_side=True) as tls:
+                print(f"Application started…, listening to {ip}:{port}")
                 self.mainloop(tls)
