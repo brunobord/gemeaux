@@ -1,11 +1,12 @@
-from gemeaux import App
-from gemeaux.handlers import Handler, StaticHandler
-from gemeaux.responses import (
+from gemeaux import (
+    App,
+    Handler,
     InputResponse,
     NotFoundResponse,
     PermanentRedirectResponse,
     RedirectResponse,
     SensitiveInputResponse,
+    StaticHandler,
     TextResponse,
 )
 

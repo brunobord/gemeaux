@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
-from gemeaux import App
-from gemeaux.responses import NotFoundResponse
+from gemeaux import App, NotFoundResponse
 
 
 @patch("ssl.SSLContext.load_cert_chain")

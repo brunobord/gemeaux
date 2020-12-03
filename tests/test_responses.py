@@ -1,6 +1,6 @@
 import pytest
 
-from gemeaux.responses import (
+from gemeaux import (
     DirectoryListingResponse,
     DocumentResponse,
     InputResponse,

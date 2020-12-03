@@ -1,7 +1,6 @@
 import pytest
 
-from gemeaux.handlers import Handler
-from gemeaux.responses import Response
+from gemeaux import Handler, Response
 
 
 class FakeResponse(Response):

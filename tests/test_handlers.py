@@ -1,8 +1,11 @@
 import pytest
 
-from gemeaux.exceptions import ImproperlyConfigured
-from gemeaux.handlers import StaticHandler
-from gemeaux.responses import DirectoryListingResponse, DocumentResponse
+from gemeaux import (
+    DirectoryListingResponse,
+    DocumentResponse,
+    ImproperlyConfigured,
+    StaticHandler,
+)
 
 # Same as in conftest.py, but can't import it
 INDEX_CONTENT = """# Title\r\nI am the content of index"""

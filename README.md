@@ -71,8 +71,7 @@ culpa qui officia deserunt mollit anim id est laborum.
 Then you'll create a python file (e.g.: `app.py`) containing the following:
 
 ```python
-from gemeaux import App
-from gemeaux.handlers import StaticHandler
+from gemeaux import App, StaticHandler
 
 if __name__ == "__main__":
     urls = {
