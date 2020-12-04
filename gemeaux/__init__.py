@@ -23,6 +23,8 @@ from .responses import (
     crlf,
 )
 
+__version__ = "0.0.2.dev0"
+
 
 def get_path(url):
     """
@@ -54,8 +56,18 @@ class Config:
             type=int,
             help="Maximum number of connections — default: 5",
         )
+        parser.add_argument(
+            "--version",
+            help="Return version and exits",
+            action="store_true",
+            default=False,
+        )
 
         args = parser.parse_args()
+
+        if args.version:
+            sys.exit(__version__)
+
         self.ip = args.ip
         self.port = args.port
         self.certfile = args.certfile
@@ -63,8 +75,8 @@ class Config:
         self.nb_connections = args.nb_connections
 
 
-BANNER = """
-♊ Welcome to your Gémeaux server ♊
+BANNER = f"""
+♊ Welcome to your Gémeaux server (v{__version__}) ♊
 """
 
 
