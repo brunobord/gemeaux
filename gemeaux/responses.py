@@ -1,9 +1,19 @@
+import mimetypes
 from itertools import chain
 from os import listdir
 from os.path import abspath, isdir, isfile
 from string import Template
 
 from .exceptions import TemplateError
+
+MIMETYPES = mimetypes.MimeTypes()
+# All known mimetypes have to be read in the system.
+# https://bugs.python.org/issue38656
+for fn in mimetypes.knownfiles:
+    if isfile(fn):
+        MIMETYPES.read(fn)
+MIMETYPES.add_type("text/gemini", ".gmi")
+MIMETYPES.add_type("text/gemini", ".gemini")
 
 
 def crlf(text):
@@ -21,12 +31,14 @@ class Response:
     """
 
     status = 20
+    mimetype = "text/gemini; charset=utf-8"
 
     def __meta__(self):
         """
         Default responses are OK responses (code: 20)
         """
-        return b"20 text/gemini; charset=utf-8"
+        meta = f"{self.status} {self.mimetype}"
+        return bytes(meta, encoding="utf-8")
 
     def __body__(self):
         return None
@@ -35,16 +47,24 @@ class Response:
         """
         Return the response sent via the connection
         """
+        # Use cache whenever it's possible to avoid round trip with bool() in log
+        if hasattr(self, "__bytes"):
+            return getattr(self, "__bytes")
+
         # Composed of the META line and the body
         response = [self.__meta__(), self.__body__()]
         # Only non-empty items are sent
         response = filter(bool, response)
-        # responses should be terminated by \r\n
-        response = map(lambda x: x + b"\r\n", response)
-        # Joined to be sent back
-        response = b"".join(response)
-        # Convert all non-conform line endings to `\r\n`
+        # Joining using the right linefeed separator
+        response = b"\r\n".join(response)
+
+        # Binary bodies should be returned as is.
+        if not self.mimetype.startswith("text/"):
+            setattr(self, "__bytes", response)
+            return response
+
         response = crlf(response)
+        setattr(self, "__bytes", response)
         return response
 
     def __len__(self):
@@ -152,6 +172,21 @@ class DocumentResponse(Response):
             raise FileNotFoundError
         with open(full_path, "rb") as fd:
             self.content = fd.read()
+        self.mimetype = self.guess_mimetype(full_path)
+
+    def guess_mimetype(self, filename):
+        """
+        Guess the mimetype of a file based on the file extension.
+        """
+        mime, encoding = MIMETYPES.guess_type(filename)
+        if encoding:
+            return f"{mime}; charset={encoding}"
+        else:
+            return mime or "application/octet-stream"
+
+    def __meta__(self):
+        meta = f"{self.status} {self.mimetype}"
+        return bytes(meta, encoding="utf-8")
 
     def __body__(self):
         return self.content
@@ -199,8 +234,8 @@ class TextResponse(Response):
             content.append("")
         if body:
             content.append(body)
-
-        content = "\r\n".join(content)
+        content = map(lambda x: x + "\r\n", content)
+        content = "".join(content)
         self.content = bytes(content, encoding="utf-8")
 
     def __body__(self):

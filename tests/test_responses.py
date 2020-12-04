@@ -87,7 +87,7 @@ def test_document_response(index_directory, index_content):
     )
     assert response.status == 20
     bytes_content = bytes(index_content, encoding="utf-8")
-    bytes_body = b"20 text/gemini; charset=utf-8\r\n" + bytes_content + b"\r\n"
+    bytes_body = b"20 text/gemini\r\n" + bytes_content + b"\r\n"
     assert response.__body__() == bytes_content
     assert bytes(response) == bytes_body
 
@@ -115,7 +115,16 @@ def test_document_response_crlf(
     )
     assert response.status == 20
     multi_line_body_expected = bytes(multi_line_content_crlf, encoding="utf-8")
-    bytes_body = b"20 text/gemini; charset=utf-8\r\n" + multi_line_body_expected
+    bytes_body = b"20 text/gemini\r\n" + multi_line_body_expected
+    assert bytes(response) == bytes_body
+
+
+def test_document_response_binary(index_directory, image_content):
+    response = DocumentResponse(
+        index_directory.join("image.png").strpath, index_directory.strpath
+    )
+    assert response.status == 20
+    bytes_body = b"20 image/png\r\n" + image_content
     assert bytes(response) == bytes_body
 
 

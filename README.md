@@ -131,7 +131,6 @@ This project is mostly for education purposes, although it can possibly be used 
 * The internals of `Gemeaux` are being tested on Python3.6+, but not the mainloop mechanics.
 * The vast majority of Gemini Standard responses are not implemented.
 * The Handler & Response documentation is missing, along with docstrings.
-* Only `text/gemini` responses are handled ; other mimetypes would need to be implemented.
 * Performances are probably very low, there might be room for optimisation.
 
 ----

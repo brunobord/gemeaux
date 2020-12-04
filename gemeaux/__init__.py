@@ -114,14 +114,24 @@ class App:
         """
         Log for access to the server
         """
-        message = '{} [{}] "{}" {} {}'.format(
+        status = mimetype = "??"
+        response_size = 0
+        if response:
+            error = response.status > 20
+            status = response.status
+            response_size = len(response)
+            mimetype = response.mimetype.split(";")[0]
+        else:
+            error = True
+        message = '{} [{}] "{}" {} {} {}'.format(
             address,
             time.strftime(self.TIMESTAMP_FORMAT, time.localtime()),
             url.strip(),
-            response.status if response else "??",
-            len(response) if response else 0,
+            mimetype,
+            status,
+            response_size,
         )
-        self.log(message, error=(not response or response.status != 20))
+        self.log(message, error=error)
 
     def get_route(self, path):
 

@@ -1,0 +1,13 @@
+# Alternate mimetypes & links
+
+Below is a link to an image. Your gemini client should download it.
+
+=> caffeine.png
+
+source of the illustration (your client should open your web browser):
+
+=> https://commons.wikimedia.org/wiki/File:Caffeine_molecule.png
+
+Now with a pure text file (extension .txt)
+
+=> test.txt

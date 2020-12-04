@@ -1,3 +1,5 @@
+from os.path import abspath, dirname, join
+
 import pytest
 
 from gemeaux import Handler, Response, TemplateResponse
@@ -59,8 +61,20 @@ def multi_line_content_crlf():
 
 
 @pytest.fixture()
+def image_content():
+    path = dirname(abspath(__file__))
+    with open(join(path, "caffeine.png"), "rb") as fd:
+        return fd.read()
+
+
+@pytest.fixture()
 def index_directory(
-    tmpdir_factory, index_content, other_content, sub_content, multi_line_content
+    tmpdir_factory,
+    index_content,
+    other_content,
+    sub_content,
+    multi_line_content,
+    image_content,
 ):
     p = tmpdir_factory.mktemp("var")
     # Create index file
@@ -75,6 +89,10 @@ def index_directory(
 
     sub = p.mkdir("subdir").join("sub.gmi")
     sub.write_text(sub_content, encoding="utf-8")
+
+    # Write the image content into the image file
+    image = p.join("image.png")
+    image.write_binary(image_content)
 
     # Return directory
     return p
