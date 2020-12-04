@@ -11,48 +11,43 @@ from gemeaux import (
     TemplateResponse,
 )
 
-# Same as in conftest.py, but can't import it
-INDEX_CONTENT = """# Title\r\nI am the content of index"""
-OTHER_CONTENT = """# Title\r\nI am the content of other"""
-SUB_CONTENT = """# Title\r\nI am the content of sub"""
-
 
 def test_static_handler_not_a_directory():
     with pytest.raises(ImproperlyConfigured):
         StaticHandler("/tmp/not-a-directory")
 
 
-def test_static_handler_document(index_directory):
+def test_static_handler_document(index_directory, index_content, other_content):
     handler = StaticHandler(index_directory)
     response = handler.get_response("", "/")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(INDEX_CONTENT, encoding="utf-8")
+    assert response.content == bytes(index_content, encoding="utf-8")
 
     # Reaching directly index.gmi
     handler = StaticHandler(index_directory)
     response = handler.get_response("", "/index.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(INDEX_CONTENT, encoding="utf-8")
+    assert response.content == bytes(index_content, encoding="utf-8")
 
     # Reaching directly index.gmi / no starting slash
     handler = StaticHandler(index_directory)
     response = handler.get_response("/", "index.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(INDEX_CONTENT, encoding="utf-8")
+    assert response.content == bytes(index_content, encoding="utf-8")
 
     # Reaching directly other.gmi
     handler = StaticHandler(index_directory)
     response = handler.get_response("", "/other.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(OTHER_CONTENT, encoding="utf-8")
+    assert response.content == bytes(other_content, encoding="utf-8")
 
 
-def test_static_handler_subdir(index_directory):
+def test_static_handler_subdir(index_directory, sub_content):
     # Reaching direct /subdir/sub.gmi
     handler = StaticHandler(index_directory)
     response = handler.get_response("", "/subdir/sub.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(SUB_CONTENT, encoding="utf-8")
+    assert response.content == bytes(sub_content, encoding="utf-8")
 
     # No Index -> Directory Listing
     handler = StaticHandler(index_directory)
@@ -61,11 +56,11 @@ def test_static_handler_subdir(index_directory):
     assert response.content.startswith(b"# Directory listing for `/subdir`\r\n")
 
 
-def test_static_handler_sub_url(index_directory):
+def test_static_handler_sub_url(index_directory, index_content):
     handler = StaticHandler(index_directory)
     response = handler.get_response("/test", "/test/index.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(INDEX_CONTENT, encoding="utf-8")
+    assert response.content == bytes(index_content, encoding="utf-8")
 
 
 def test_static_handler_not_found(index_directory):
@@ -83,12 +78,14 @@ def test_static_handler_not_found(index_directory):
         handler.get_response("", "/subdir/not-found.gmi")
 
 
-def test_static_handler_no_directory_listing(index_directory):
+def test_static_handler_no_directory_listing(
+    index_directory, index_content, sub_content
+):
     handler = StaticHandler(index_directory, directory_listing=False)
     # No change in response for "/"
     response = handler.get_response("", "/")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(INDEX_CONTENT, encoding="utf-8")
+    assert response.content == bytes(index_content, encoding="utf-8")
 
     # Subdir -> no index -> no directory listing
     with pytest.raises(FileNotFoundError):
@@ -101,15 +98,15 @@ def test_static_handler_no_directory_listing(index_directory):
     # subdir/sub.gmi
     response = handler.get_response("", "/subdir/sub.gmi")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(SUB_CONTENT, encoding="utf-8")
+    assert response.content == bytes(sub_content, encoding="utf-8")
 
 
-def test_static_handler_alternate_index(index_directory):
+def test_static_handler_alternate_index(index_directory, other_content):
     handler = StaticHandler(index_directory, index_file="other.gmi")
     # "/" returns other.gmi content
     response = handler.get_response("", "/")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(OTHER_CONTENT, encoding="utf-8")
+    assert response.content == bytes(other_content, encoding="utf-8")
 
     # Subdir -> no other.gmi -> directory listing
     response = handler.get_response("", "/subdir/")
@@ -117,14 +114,14 @@ def test_static_handler_alternate_index(index_directory):
     assert response.content.startswith(b"# Directory listing for `/subdir`\r\n")
 
 
-def test_static_handler_alternate_index_no_dirlist(index_directory):
+def test_static_handler_alternate_index_no_dirlist(index_directory, other_content):
     handler = StaticHandler(
         index_directory, directory_listing=False, index_file="other.gmi"
     )
     # "/" returns other.gmi content
     response = handler.get_response("", "/")
     assert isinstance(response, DocumentResponse)
-    assert response.content == bytes(OTHER_CONTENT, encoding="utf-8")
+    assert response.content == bytes(other_content, encoding="utf-8")
 
     # Subdir -> no other.gmi -> no directory listing
     with pytest.raises(FileNotFoundError):

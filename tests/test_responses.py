@@ -15,11 +15,6 @@ from gemeaux import (
     TextResponse,
 )
 
-# Same as in conftest.py, but can't import it
-INDEX_CONTENT = """# Title\r\nI am the content of index"""
-OTHER_CONTENT = """# Title\r\nI am the content of other"""
-SUB_CONTENT = """# Title\r\nI am the content of sub"""
-
 
 def test_base_response():
     response = Response()
@@ -85,12 +80,12 @@ def test_not_found_response_reason():
     assert bytes(response) == b"51 The document is unreadable\r\n"
 
 
-def test_document_response(index_directory):
+def test_document_response(index_directory, index_content):
     response = DocumentResponse(
         index_directory.join("index.gmi").strpath, index_directory.strpath
     )
     assert response.status == 20
-    bytes_content = bytes(INDEX_CONTENT, encoding="utf-8")
+    bytes_content = bytes(index_content, encoding="utf-8")
     bytes_body = b"20 text/gemini; charset=utf-8\r\n" + bytes_content + b"\r\n"
     assert response.__body__() == bytes_content
     assert bytes(response) == bytes_body

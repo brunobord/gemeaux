@@ -33,23 +33,33 @@ def fake_handler_exception():
     return FakeHandlerRaiseException()
 
 
-INDEX_CONTENT = """# Title\r\nI am the content of index"""
-OTHER_CONTENT = """# Title\r\nI am the content of other"""
-SUB_CONTENT = """# Title\r\nI am the content of sub"""
+@pytest.fixture()
+def index_content():
+    return """# Title\r\nI am the content of index"""
 
 
 @pytest.fixture()
-def index_directory(tmpdir_factory):
+def other_content():
+    return """# Title\r\nI am the content of other"""
+
+
+@pytest.fixture()
+def sub_content():
+    return """# Title\r\nI am the content of sub"""
+
+
+@pytest.fixture()
+def index_directory(tmpdir_factory, index_content, other_content, sub_content):
     p = tmpdir_factory.mktemp("var")
     # Create index file
     pp = p.join("index.gmi")
-    pp.write_text(INDEX_CONTENT, encoding="utf-8")
+    pp.write_text(index_content, encoding="utf-8")
     # Other file
     pp = p.join("other.gmi")
-    pp.write_text(OTHER_CONTENT, encoding="utf-8")
+    pp.write_text(other_content, encoding="utf-8")
 
     sub = p.mkdir("subdir").join("sub.gmi")
-    sub.write_text(SUB_CONTENT, encoding="utf-8")
+    sub.write_text(sub_content, encoding="utf-8")
 
     # Return directory
     return p

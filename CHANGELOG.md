@@ -3,6 +3,7 @@
 ## master (unreleased)
 
 * Added `TemplateResponse` & `TemplateHandler` classes for generating Gemini content using template files.
+* Improved conftest for pytest using fixtures for document content.
 
 ## v0.0.1 (2020-12-04)
 
