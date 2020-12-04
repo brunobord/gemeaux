@@ -154,6 +154,35 @@ class NotFoundResponse(Response):
         return bytes(meta, encoding="utf-8")
 
 
+class ProxyRequestRefusedResponse(Response):
+    """
+    Proxy Request Refused response. Status code: 53
+    """
+
+    status = 53
+
+    def __meta__(self):
+        meta = f"{self.status} PROXY REQUEST REFUSED"
+        return bytes(meta, encoding="utf-8")
+
+
+class BadRequestResponse(Response):
+    """
+    Bad Request response. Status code: 59.
+    """
+
+    status = 59
+
+    def __init__(self, reason=None):
+        if not reason:
+            reason = "BAD REQUEST"
+        self.reason = reason
+
+    def __meta__(self):
+        meta = f"{self.status} {self.reason}"
+        return bytes(meta, encoding="utf-8")
+
+
 class DocumentResponse(Response):
     """
     Document response

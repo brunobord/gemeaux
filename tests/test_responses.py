@@ -1,12 +1,14 @@
 import pytest
 
 from gemeaux import (
+    BadRequestResponse,
     DirectoryListingResponse,
     DocumentResponse,
     InputResponse,
     NotFoundResponse,
     PermanentFailureResponse,
     PermanentRedirectResponse,
+    ProxyRequestRefusedResponse,
     RedirectResponse,
     Response,
     SensitiveInputResponse,
@@ -79,6 +81,27 @@ def test_not_found_response_reason():
     assert response.status == 51
     assert response.__body__() is None
     assert bytes(response) == b"51 The document is unreadable\r\n"
+
+
+def test_proxy_refused_response():
+    response = ProxyRequestRefusedResponse()
+    assert response.status == 53
+    assert response.__body__() is None
+    assert bytes(response) == b"53 PROXY REQUEST REFUSED\r\n"
+
+
+def test_bad_request_response():
+    response = BadRequestResponse()
+    assert response.status == 59
+    assert response.__body__() is None
+    assert bytes(response) == b"59 BAD REQUEST\r\n"
+
+
+def test_bad_request_response_reason():
+    response = BadRequestResponse(reason="You sent me a wrong request")
+    assert response.status == 59
+    assert response.__body__() is None
+    assert bytes(response) == b"59 You sent me a wrong request\r\n"
 
 
 def test_document_response(index_directory, index_content):

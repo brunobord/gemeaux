@@ -11,6 +11,8 @@
 * Added mimetype of response to the access log.
 * Added documentation for Handlers.
 * Redirect clients when pointing at a static subdirectory without a trailing slash. It caused misdirections because the client was requesting the "/document.gmi" instead of the "/subdir/document.gmi".
+* Improve application resilience after auditing it with [gemini-diagnostic](https://github.com/michael-lazar/gemini-diagnostics). Everything is not perfect, but that's a good start, to be honest.
+* Added `BadRequestResponse`, `ProxyRequestRefusedResponse` classes
 
 ## v0.0.1 (2020-12-04)
 

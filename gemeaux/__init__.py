@@ -1,4 +1,5 @@
 import collections
+import ssl
 import sys
 import time
 from argparse import ArgumentParser
@@ -6,15 +7,23 @@ from socket import AF_INET, SOCK_STREAM, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
 from urllib.parse import urlparse
 
-from .exceptions import ImproperlyConfigured, TemplateError
+from .exceptions import (
+    BadRequestException,
+    ImproperlyConfigured,
+    ProxyRequestRefusedException,
+    TemplateError,
+    TimeoutException,
+)
 from .handlers import Handler, StaticHandler, TemplateHandler
 from .responses import (
+    BadRequestResponse,
     DirectoryListingResponse,
     DocumentResponse,
     InputResponse,
     NotFoundResponse,
     PermanentFailureResponse,
     PermanentRedirectResponse,
+    ProxyRequestRefusedResponse,
     RedirectResponse,
     Response,
     SensitiveInputResponse,
@@ -24,16 +33,6 @@ from .responses import (
 )
 
 __version__ = "0.0.2.dev0"
-
-
-def get_path(url):
-    """
-    Parse a URL and return a path relative to the root
-    """
-    url = url.strip()
-    parsed = urlparse(url, "gemini")
-    path = parsed.path
-    return path
 
 
 class Config:
@@ -75,14 +74,22 @@ class Config:
         self.nb_connections = args.nb_connections
 
 
-BANNER = f"""
-♊ Welcome to your Gémeaux server (v{__version__}) ♊
-"""
+def get_path(url):
+    """
+    Parse a URL and return a path relative to the root
+    """
+    url = url.strip()
+    parsed = urlparse(url, "gemini")
+    path = parsed.path
+    return path
 
 
 class App:
 
     TIMESTAMP_FORMAT = "%d/%b/%Y:%H:%M:%S %z"
+    BANNER = f"""
+♊ Welcome to your Gémeaux server (v{__version__}) ♊
+"""
 
     def __init__(self, urls):
         # Check the urls
@@ -154,8 +161,64 @@ class App:
 
         raise FileNotFoundError("Route Not Found")
 
-    def get_response(self, url):
+    def check_url(self, url):
+        """
+        Check for the client URL conformity.
 
+        Raise exception or return None
+        """
+        parsed = urlparse(url, "gemini")
+
+        # Check for bad request
+        # Note: the URL will be cleaned before being used
+        if not parsed.path.endswith("\r\n"):
+            # TimeoutException will cause no response
+            raise TimeoutException
+        # Other than Gemini will trigger a PROXY ERROR
+        if parsed.scheme != "gemini":
+            raise ProxyRequestRefusedException
+        # You need to provide the right scheme
+        if not url.startswith("gemini://"):
+            # BadRequestException will return BadRequestResponse
+            raise BadRequestException
+        # URL max length is 1024.
+        if len(url.strip()) > 1024:
+            # BadRequestException will return BadRequestResponse
+            raise BadRequestException
+        # Not the right port
+        if ":" in parsed.netloc:
+            location, port = parsed.netloc.split(":")
+            if int(port) != self.port:
+                raise ProxyRequestRefusedException
+
+    def exception_handling(self, exception, connection):
+        """
+        Handle exceptions and errors when the client is requesting a resource.
+        """
+        response = None
+        if isinstance(exception, OSError):
+            response = PermanentFailureResponse("OS Error")
+        elif isinstance(exception, (ssl.SSLEOFError, ssl.SSLError)):
+            response = PermanentFailureResponse("SSL Error")
+        elif isinstance(exception, UnicodeDecodeError):
+            response = BadRequestResponse("Unicode Decode Error")
+        elif isinstance(exception, BadRequestException):
+            response = BadRequestResponse()
+        elif isinstance(exception, ProxyRequestRefusedException):
+            response = ProxyRequestRefusedResponse()
+        elif isinstance(exception, ConnectionResetError):
+            # No response sent
+            self.log("Connection reset by peer...", error=True)
+        else:
+            self.log(f"Exception: {exception}", error=True)
+
+        try:
+            if response and connection:
+                connection.sendall(bytes(response))
+        except Exception as exc:
+            self.log(f"Exception while processing exception… {exc}", error=True)
+
+    def get_response(self, url):
         path = get_path(url)
         reason = None
         try:
@@ -176,20 +239,25 @@ class App:
         return NotFoundResponse(reason)
 
     def mainloop(self, tls):
-        connection = response = None
         while True:
-            do_log = True
+            connection = response = None
+            address = url = ""
+            do_log = False
             try:
                 connection, (address, _) = tls.accept()
-                url = connection.recv(1024).decode()
+                url = connection.recv(2048).decode()
+
+                # Check URL conformity.
+                self.check_url(url)
+
                 response = self.get_response(url)
                 connection.sendall(bytes(response))
-            except ConnectionResetError:
-                self.log("Connection reset by peer...")
+                do_log = True
             except KeyboardInterrupt:
-                do_log = False
                 print("bye")
                 sys.exit()
+            except Exception as exc:
+                self.exception_handling(exc, connection)
             finally:
                 if connection:
                     connection.close()
@@ -205,13 +273,14 @@ class App:
         """
         # Loading config only at runtime, not initialization
         config = Config()
+        self.port = config.port
         context = SSLContext(PROTOCOL_TLS_SERVER)
         context.load_cert_chain(config.certfile, config.keyfile)
 
         with socket(AF_INET, SOCK_STREAM) as server:
             server.bind((config.ip, config.port))
             server.listen(config.nb_connections)
-            print(BANNER)
+            print(self.BANNER)
             with context.wrap_socket(server, server_side=True) as tls:
                 print(f"Application started…, listening to {config.ip}:{config.port}")
                 self.mainloop(tls)
@@ -236,6 +305,7 @@ __all__ = [
     "PermanentRedirectResponse",
     "PermanentFailureResponse",
     "NotFoundResponse",
+    "BadRequestResponse",
     # Advanced responses
     "DocumentResponse",
     "DirectoryListingResponse",
