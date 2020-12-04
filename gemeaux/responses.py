@@ -6,6 +6,15 @@ from string import Template
 from .exceptions import TemplateError
 
 
+def crlf(text):
+    r"""
+    Normalize line endings to unix (``\r\n``). Text should be bytes.
+    """
+    lines = text.splitlines()  # Will remove all types of linefeeds
+    lines = map(lambda x: x + b"\r\n", lines)  # append the "true" linefeed
+    return b"".join(lines)
+
+
 class Response:
     """
     Basic Gemini response
@@ -34,6 +43,8 @@ class Response:
         response = map(lambda x: x + b"\r\n", response)
         # Joined to be sent back
         response = b"".join(response)
+        # Convert all non-conform line endings to `\r\n`
+        response = crlf(response)
         return response
 
     def __len__(self):

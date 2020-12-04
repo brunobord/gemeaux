@@ -49,7 +49,19 @@ def sub_content():
 
 
 @pytest.fixture()
-def index_directory(tmpdir_factory, index_content, other_content, sub_content):
+def multi_line_content():
+    return "First line\nSecond line\rThird line\r\nLast line."
+
+
+@pytest.fixture()
+def multi_line_content_crlf():
+    return "First line\r\nSecond line\r\nThird line\r\nLast line.\r\n"
+
+
+@pytest.fixture()
+def index_directory(
+    tmpdir_factory, index_content, other_content, sub_content, multi_line_content
+):
     p = tmpdir_factory.mktemp("var")
     # Create index file
     pp = p.join("index.gmi")
@@ -57,6 +69,9 @@ def index_directory(tmpdir_factory, index_content, other_content, sub_content):
     # Other file
     pp = p.join("other.gmi")
     pp.write_text(other_content, encoding="utf-8")
+    # Multi line file
+    pp = p.join("multi_line.gmi")
+    pp.write_text(multi_line_content, encoding="utf-8")
 
     sub = p.mkdir("subdir").join("sub.gmi")
     sub.write_text(sub_content, encoding="utf-8")

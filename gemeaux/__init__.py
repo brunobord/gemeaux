@@ -20,6 +20,7 @@ from .responses import (
     SensitiveInputResponse,
     TemplateResponse,
     TextResponse,
+    crlf,
 )
 
 
@@ -205,6 +206,7 @@ __all__ = [
     "StaticHandler",
     "TemplateHandler",
     # Responses
+    "crlf",  # Response tool
     "Response",
     "InputResponse",
     "SensitiveInputResponse",

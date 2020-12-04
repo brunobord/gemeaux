@@ -13,6 +13,7 @@ from gemeaux import (
     TemplateError,
     TemplateResponse,
     TextResponse,
+    crlf,
 )
 
 
@@ -106,6 +107,18 @@ def test_document_response_not_a_file(index_directory):
         )
 
 
+def test_document_response_crlf(
+    index_directory, multi_line_content, multi_line_content_crlf
+):
+    response = DocumentResponse(
+        index_directory.join("multi_line.gmi").strpath, index_directory.strpath
+    )
+    assert response.status == 20
+    multi_line_body_expected = bytes(multi_line_content_crlf, encoding="utf-8")
+    bytes_body = b"20 text/gemini; charset=utf-8\r\n" + multi_line_body_expected
+    assert bytes(response) == bytes_body
+
+
 def test_directory_listing(index_directory):
     response = DirectoryListingResponse(
         index_directory.strpath, index_directory.strpath
@@ -113,9 +126,16 @@ def test_directory_listing(index_directory):
 
     assert response.status == 20
     assert response.__meta__() == b"20 text/gemini; charset=utf-8"
-    assert response.__body__().startswith(b"# Directory listing for ``\r\n")
-    assert b"=> /subdir\r\n" in response.__body__()
-    assert b"=> /other.gmi\r\n" in response.__body__()
+    assert response.__body__().startswith(b"# Directory listing for ``")
+    assert b"=> /subdir" in response.__body__()
+    assert b"=> /other.gmi" in response.__body__()
+
+
+def test_directory_listing_crlf(index_directory):
+    response = DirectoryListingResponse(
+        index_directory.strpath, index_directory.strpath
+    )
+    assert bytes(response) == crlf(bytes(response))
 
 
 def test_directory_listing_subdir(index_directory):
@@ -148,7 +168,7 @@ def test_text_response():
     assert bytes(response) == (
         b"20 text/gemini; charset=utf-8\r\n"  # header
         b"# Title\r\n"  # Title
-        b"\r\n"  # Linefeed
+        b"\r\n"  # empty line
     )
 
     # No title, A body
@@ -162,7 +182,7 @@ def test_text_response():
     assert bytes(response) == (
         b"20 text/gemini; charset=utf-8\r\n"  # header
         b"# Title\r\n"  # Title
-        b"\r\n"  # Linefeed
+        b"\r\n"  # Empty line
         b"My body\r\n"  # Body
     )
 
@@ -177,6 +197,10 @@ def test_template_response(template_file):
     )
     assert response.status == 20
     assert response.__body__() == b"First var: value1 / Second var: value2"
+    assert bytes(response) == (
+        b"20 text/gemini; charset=utf-8\r\n"
+        b"First var: value1 / Second var: value2\r\n"
+    )
 
 
 def test_template_response_wrong_context(template_file):
