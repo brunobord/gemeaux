@@ -1,5 +1,9 @@
 # Gemeaux changelog
 
+## master (unreleased)
+
+Nothing new here yet.
+
 ## v0.0.1 (2020-12-04)
 
 This is the first release of `Gemeaux` server.
