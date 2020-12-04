@@ -17,7 +17,7 @@ A quick word about Gemini protocol. Since it's a different protocol from HTTP, o
 * [A list of clients on the canonical Gemini Space](https://gemini.circumlunar.space/clients.html)
 * [A curated list of clients on "awesome Gemini"](https://github.com/kr1sp1n/awesome-gemini#clients)
 
-Download and install a couple of clients, pick one that fits your needs, and you'll be ready to spacewalk the Gemini ecosystem.
+Download and install a couple of clients, pick one that fits your needs, or if you feel like it, build one yourself, and you'll be ready to spacewalk the Gemini ecosystem.
 
 For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a browser made for bash, because it displays helpful debug messages (and it's as fast as you can dream).
 
@@ -31,15 +31,24 @@ You'll also need `openssl` to generate certificates.
 
 ## Quickstart
 
-To install `gemeaux` package, inside a virtualenv, or in a safe environment, run the following:
+### Install via PyPI
+
+To install the latest release of `gemeaux` package, inside a virtualenv, or in a safe environment, run the following:
+
+```sh
+pip install gemeaux
+```
+
+### Developer mode
 
 ```sh
 git clone https://github.com/brunobord/gemeaux.git
+# You may also want to use this source: git@github.com:brunobord/gemeaux.git
 cd gemeaux/
 pip install -e .
 ```
 
-*SOON: install via PyPI.*
+### Generate certificates
 
 Since TLS is mandatory, you'll have to generate your own SSL certificate files. Use the following command to generate self-signed certificate files, targeting a localhost/developer mode:
 
@@ -103,7 +112,7 @@ python app.py --ip 0.0.0.0
 
 **BIG WARNING**: opening your server to external connections is **DEFINITELY NOT A GOOD IDEA**, since this software **IS NOT PRODUCTION-READY**.
 
-You can change these default options using the optional arguments. For more details, run:
+You can change the default configuration values using the optional arguments. For more details, run:
 
 ```sh
 python app.py --help

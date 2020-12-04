@@ -1,4 +1,9 @@
+# Do not commit certificates
 *.pem
+# Tests
+.tox/
+# Python-generated files and dirs
 __pycache__
 *.egg-info
-.tox/
+build/
+dist/
