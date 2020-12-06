@@ -6,6 +6,7 @@ from gemeaux import (
     DirectoryListingResponse,
     DocumentResponse,
     ImproperlyConfigured,
+    RedirectResponse,
     StaticHandler,
     TemplateHandler,
     TemplateResponse,
@@ -55,6 +56,12 @@ def test_static_handler_subdir(index_directory, sub_content):
     assert isinstance(response, DirectoryListingResponse)
     assert response.content.startswith(b"# Directory listing for `/subdir`\r\n")
 
+    # No Index + No slash -> Directory Listing
+    handler = StaticHandler(index_directory)
+    response = handler.get_response("", "/subdir")
+    assert isinstance(response, RedirectResponse)
+    assert response.target == "subdir/"
+
 
 def test_static_handler_sub_url(index_directory, index_content):
     handler = StaticHandler(index_directory)
@@ -87,9 +94,10 @@ def test_static_handler_no_directory_listing(
     assert isinstance(response, DocumentResponse)
     assert response.content == bytes(index_content, encoding="utf-8")
 
-    # Subdir -> no index -> no directory listing
-    with pytest.raises(FileNotFoundError):
-        handler.get_response("", "/subdir")
+    # Subdir + no slash -> Redirect to "/"
+    response = handler.get_response("", "/subdir")
+    assert isinstance(response, RedirectResponse)
+    assert response.target == "subdir/"
 
     # Subdir -> no index -> no directory listing
     with pytest.raises(FileNotFoundError):

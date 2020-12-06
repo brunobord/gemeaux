@@ -1,7 +1,12 @@
 from os.path import abspath, isdir, isfile, join
 
 from .exceptions import ImproperlyConfigured
-from .responses import DirectoryListingResponse, DocumentResponse, TemplateResponse
+from .responses import (
+    DirectoryListingResponse,
+    DocumentResponse,
+    RedirectResponse,
+    TemplateResponse,
+)
 
 
 class Handler:
@@ -59,6 +64,9 @@ class StaticHandler(Handler):
         # print(f"StaticHandler: path='{full_path}'")
         # The path leads to a directory
         if isdir(full_path):
+            # Directory. Redirect if not root?
+            if path and not path.endswith("/"):
+                return RedirectResponse(f"{path}/")
             # Directory -> index?
             index_path = join(full_path, self.index_file)
             if isfile(index_path):

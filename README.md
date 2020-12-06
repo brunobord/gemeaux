@@ -135,7 +135,7 @@ Most of the time, when working with `Handler` basic classes, you'll have to impl
 
 #### StaticHandler
 
-This handler is used for serving a static directory.
+This handler is used for serving a static directory and its subdirectories.
 
 How to instantiate:
 
@@ -147,9 +147,11 @@ StaticHandler(
 )
 ```
 
-* `static_dir`: the path (relative to your program or absolute) of the root directory to serve. The program will also serve subdirectories.
+* `static_dir`: the path (relative to your program or absolute) of the root directory to serve.
 * `directory_listing` (default: `True`): if set to `True`, in case there's no "index file" in a directory, the application will display the directory listing. If set to `False`, and if there's still no index file in this directory, it'll return a `NotFoundResponse` to the client.
 * `index_file` (default: `"index.gmi"`): when the client tries to reach a directory, it's this filename that would be searched to be rendered as the "homepage".
+
+*Note*: If your client is trying to reach a subdirectory like this: `gemini://localhost/subdirectory` (without the trailing slash), the client will receive a Redirection Response targetting `gemini://localhost/subdirectory/` (with the trailing slash).
 
 #### TemplateHandler
 
