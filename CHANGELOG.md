@@ -9,6 +9,7 @@
 * Display version number at startup on the welcome message.
 * Handling mimetypes other than `text/gemini`. Clients would have to download them instead of trying to display them. Example app is amended.
 * Added mimetype of response to the access log.
+* Added documentation for Handlers.
 
 ## v0.0.1 (2020-12-04)
 

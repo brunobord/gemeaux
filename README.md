@@ -122,7 +122,73 @@ python app.py --help
 
 The `urls` configuration is at the core of the application workflow. By combining the available `Handler` and `Response` classes, you have the ability to create more complex Gemini spaces.
 
-See the example application, in the `example_app.py` file if you want to see an advanced usage of handlers & responses.
+You may read the example application, in the `example_app.py` file if you want to see an advanced usage of handlers & responses.
+
+Several classes are provided in this library:
+
+### Handlers
+
+Most of the time, when working with `Handler` basic classes, you'll have to implement/override two methods:
+
+* `Handler.__init__(*args, **kwargs)`: The class constructor will accept `args` and `kwargs` for providing parameters.
+* `Handler.get_response(*args, *kwargs)`: Based on the parameters and your current context, you would generate a Gemini-compatible response, either based on the `Response` classes provided, or ones you can build yourself.
+
+#### StaticHandler
+
+This handler is used for serving a static directory.
+
+How to instantiate:
+
+```python
+StaticHandler(
+    static_dir,
+    directory_listing=True,
+    index_file="index.gmi"
+)
+```
+
+* `static_dir`: the path (relative to your program or absolute) of the root directory to serve. The program will also serve subdirectories.
+* `directory_listing` (default: `True`): if set to `True`, in case there's no "index file" in a directory, the application will display the directory listing. If set to `False`, and if there's still no index file in this directory, it'll return a `NotFoundResponse` to the client.
+* `index_file` (default: `"index.gmi"`): when the client tries to reach a directory, it's this filename that would be searched to be rendered as the "homepage".
+
+#### TemplateHandler
+
+This handler provides methods to render Gemini content, mixing a text template and context variables.
+
+The constructor has no specific arguments, but accepts `*args` and `**kwargs`. You'll have to overwrite/override two methods in order to correctly mix the template content with the context variables.
+
+To retrieve the template file, you can overwrite/override the `get_template_file()` method:
+
+```python
+TemplateHandler.get_template_file()
+```
+
+Alternatively, you may assign it a static `template_file` attribute, like this:
+```python
+class MyTemplateHandler(TemplateHandler):
+    template_file = "/path/to/template.txt"
+```
+The template file name doesn't require a specific file extension. By default, `TemplateHandler` instances will use the [`string.Template` module from the standard library](https://docs.python.org/3/library/string.html#string.Template) to render content.
+
+**Note**: we know that this "template engine" is a bit too minimalist for advanced purposes ; but as this project mantra is "no external dependencies". Still, this project is a Python project ; so you can plug your favorite template engine and serve dynamic content the way you want.
+
+Example template:
+
+```
+I am a template file. Refresh me to see what time it is: $datetime
+```
+
+To generate your context variable(s), you'll have to overwrite/override the `get_context()` method:
+
+```python
+class DatetimeTemplateHandler(TemplateHandler):
+    template_file = "/path/to/template.txt"
+
+    def get_context(self, *args, **kwargs):
+        return {"datetime": datetime.datetime.now()}
+```
+
+This `get_context()` method should return a dictionary. When accessed, the `$datetime` variable will be replaced by its value from the context dictionary.
 
 ## Known bugs & limitations
 
@@ -130,7 +196,7 @@ This project is mostly for education purposes, although it can possibly be used 
 
 * The internals of `Gemeaux` are being tested on Python3.6+, but not the mainloop mechanics.
 * The vast majority of Gemini Standard responses are not implemented.
-* The Handler & Response documentation is missing, along with docstrings.
+* The Response documentation is missing, along with docstrings.
 * Performances are probably very low, there might be room for optimisation.
 
 ----
