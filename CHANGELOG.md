@@ -1,5 +1,9 @@
 # Gemeaux changelog
 
+## master (unreleased)
+
+Nothing here yet.
+
 ## v0.0.2 (2020-12-07)
 
 ### Following the Specs
