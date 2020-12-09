@@ -2,10 +2,12 @@ import datetime
 
 from gemeaux import (
     App,
+    BadRequestResponse,
     Handler,
     InputResponse,
     NotFoundResponse,
     PermanentRedirectResponse,
+    ProxyRequestRefusedResponse,
     RedirectResponse,
     SensitiveInputResponse,
     StaticHandler,
@@ -79,8 +81,8 @@ if __name__ == "__main__":
         # TODO: 51 NOT FOUND (already covered by other response, but nice to have)
         "/51": NotFoundResponse("Nobody will escape the Area 51"),
         # TODO: 52 GONE
-        # TODO: 53 ? PROXY REQUEST REFUSED
-        # TODO: 59 BAD REQUEST
+        "/53": ProxyRequestRefusedResponse(),
+        "/59": BadRequestResponse(),
         # TODO: 60 (?) CLIENT CERTIFICATE REQUIRED
         # TODO: 61 (?) CERTIFICATE NOT AUTHORISED
         # TODO: 62 (?) CERTIFICATE NOT VALID

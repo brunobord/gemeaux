@@ -3,6 +3,7 @@
 ## master (unreleased)
 
 * Confirmed Python 3.9 support.
+* Added `BadRequestResponse` and `ProxyRequestRefusedResponse` to the example application.
 
 ## v0.0.2 (2020-12-07)
 
