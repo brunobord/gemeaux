@@ -25,7 +25,7 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 
 `Gemeaux` is built around **the standard Python 3.6+ library** and syntax. There are **no external dependencies**.
 
-Automated tests are launched using Python 3.6, 3.7 and 3.8, so the internals of `Gemeaux` are safe with these versions of Python.
+Automated tests are launched using Python 3.6, 3.7, 3.8 and 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
 
 You'll also need `openssl` to generate certificates.
 
@@ -166,10 +166,12 @@ TemplateHandler.get_template_file()
 ```
 
 Alternatively, you may assign it a static `template_file` attribute, like this:
+
 ```python
 class MyTemplateHandler(TemplateHandler):
     template_file = "/path/to/template.txt"
 ```
+
 The template file name doesn't require a specific file extension. By default, `TemplateHandler` instances will use the [`string.Template` module from the standard library](https://docs.python.org/3/library/string.html#string.Template) to render content.
 
 **Note**: we know that this "template engine" is a bit too minimalist for advanced purposes ; but as this project mantra is "no external dependencies". Still, this project is a Python project ; so you can plug your favorite template engine and serve dynamic content the way you want.

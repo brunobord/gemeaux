@@ -2,7 +2,7 @@
 
 ## master (unreleased)
 
-Nothing here yet.
+* Confirmed Python 3.9 support.
 
 ## v0.0.2 (2020-12-07)
 
