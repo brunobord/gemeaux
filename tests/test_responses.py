@@ -12,6 +12,7 @@ from gemeaux import (
     RedirectResponse,
     Response,
     SensitiveInputResponse,
+    SuccessResponse,
     TemplateError,
     TemplateResponse,
     TextResponse,
@@ -21,10 +22,18 @@ from gemeaux import (
 
 def test_base_response():
     response = Response()
+    with pytest.raises(NotImplementedError):
+        response.status
+    assert response.__body__() is None
+    with pytest.raises(NotImplementedError):
+        response.__meta__()
+
+
+def test_success_response():
+    response = SuccessResponse()
     assert response.status == 20
     assert response.__body__() is None
     assert response.__meta__() == b"20 text/gemini; charset=utf-8"
-    assert bytes(response) == response.__meta__() + b"\r\n"
 
 
 def test_input_response():

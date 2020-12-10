@@ -30,17 +30,23 @@ class Response:
     Basic Gemini response
     """
 
-    status = 20
     mimetype = "text/gemini; charset=utf-8"
+
+    @property
+    def status(self):
+        raise NotImplementedError("You need to define this response `status` code.")
 
     def __meta__(self):
         """
-        Default responses are OK responses (code: 20)
+        Return the meta line (without the CRLF).
         """
         meta = f"{self.status} {self.mimetype}"
         return bytes(meta, encoding="utf-8")
 
     def __body__(self):
+        """
+        Default Response body is None and will not be returned to the client.
+        """
         return None
 
     def __bytes__(self):
@@ -72,6 +78,14 @@ class Response:
         Return the length of the response
         """
         return len(bytes(self))
+
+
+class SuccessResponse(Response):
+    """
+    Success Response base class. Status: 20.
+    """
+
+    status = 20
 
 
 class InputResponse(Response):
@@ -183,7 +197,37 @@ class BadRequestResponse(Response):
         return bytes(meta, encoding="utf-8")
 
 
-class DocumentResponse(Response):
+# *** GEMEAUX CUSTOM RESPONSES ***
+class TextResponse(SuccessResponse):
+    """
+    Simple text response, composed of a ``title`` and a text content. Status code: 20.
+    """
+
+    def __init__(self, title=None, body=None):
+        """
+        Raw dynamic text content.
+
+        Arguments:
+
+        * ``title``: The main title of the document. Will be flushed to the user as a 1st level title.
+        * ``body``: The main content of the response. All line feeds will be converted into ``\\r\\n``.
+        """
+        content = []
+        # Remove empty bodies
+        if title:
+            content.append(f"# {title}")
+            content.append("")
+        if body:
+            content.append(body)
+        content = map(lambda x: x + "\r\n", content)
+        content = "".join(content)
+        self.content = bytes(content, encoding="utf-8")
+
+    def __body__(self):
+        return self.content
+
+
+class DocumentResponse(SuccessResponse):
     """
     Document response
 
@@ -192,7 +236,12 @@ class DocumentResponse(Response):
 
     def __init__(self, full_path, root_dir):
         """
-        Open the document and read its content
+        Open the document and read its content.
+
+        Arguments:
+
+        * full_path: The full path for the file you want to read.
+        * root_dir: The root directory of your static content tree. The full document path should belong to this directory.
         """
         full_path = abspath(full_path)
         if not full_path.startswith(root_dir):
@@ -221,7 +270,7 @@ class DocumentResponse(Response):
         return self.content
 
 
-class DirectoryListingResponse(Response):
+class DirectoryListingResponse(SuccessResponse):
     """
     List contents of a Directory. Status code: 20
 
@@ -250,33 +299,20 @@ class DirectoryListingResponse(Response):
         return self.content
 
 
-class TextResponse(Response):
-    """
-    Simple text response, composed of a ``title`` and a text content. Status code: 20.
-    """
-
-    def __init__(self, title=None, body=None):
-        content = []
-        # Remove empty bodies
-        if title:
-            content.append(f"# {title}")
-            content.append("")
-        if body:
-            content.append(body)
-        content = map(lambda x: x + "\r\n", content)
-        content = "".join(content)
-        self.content = bytes(content, encoding="utf-8")
-
-    def __body__(self):
-        return self.content
-
-
-class TemplateResponse(Response):
+class TemplateResponse(SuccessResponse):
     """
     Template Response. Uses the stdlib Template engine to render Gemini content.
     """
 
     def __init__(self, template_file, **context):
+        """
+        Leverage ``string.Template`` API to render dynamic Gemini content through a template file.
+
+        Arguments:
+
+        * ``template_file``: full path to your template file.
+        * ``context``: multiple variables to pass in your template as template variables.
+        """
         if not isfile(template_file):
             raise TemplateError(f"Template file not found: `{template_file}`")
         with open(template_file, "r") as fd:

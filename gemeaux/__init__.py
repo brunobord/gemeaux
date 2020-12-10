@@ -27,6 +27,7 @@ from .responses import (
     RedirectResponse,
     Response,
     SensitiveInputResponse,
+    SuccessResponse,
     TemplateResponse,
     TextResponse,
     crlf,
@@ -301,6 +302,7 @@ __all__ = [
     # Responses
     "crlf",  # Response tool
     "Response",
+    "SuccessResponse",  # Basic brick for building "OK" content
     "InputResponse",
     "SensitiveInputResponse",
     "RedirectResponse",
