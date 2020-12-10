@@ -84,6 +84,38 @@ def get_path(url):
     return path
 
 
+def check_url(url, server_port):
+    """
+    Check for the client URL conformity.
+
+    Raise exception or return None
+    """
+    parsed = urlparse(url, "gemini")
+
+    # Check for bad request
+    # Note: the URL will be cleaned before being used
+    if not url.endswith("\r\n"):
+        # TimeoutException will cause no response
+        raise TimeoutException((url, parsed))
+    # Other than Gemini will trigger a PROXY ERROR
+    if parsed.scheme != "gemini":
+        raise ProxyRequestRefusedException
+    # You need to provide the right scheme
+    if not url.startswith("gemini://"):
+        # BadRequestException will return BadRequestResponse
+        raise BadRequestException
+    # URL max length is 1024.
+    if len(url.strip()) > 1024:
+        # BadRequestException will return BadRequestResponse
+        raise BadRequestException
+    # Not the right port
+    if ":" in parsed.netloc:
+        location, port = parsed.netloc.split(":")
+        if int(port) != server_port:
+            raise ProxyRequestRefusedException
+    return True
+
+
 class App:
 
     TIMESTAMP_FORMAT = "%d/%b/%Y:%H:%M:%S %z"
@@ -161,36 +193,6 @@ class App:
 
         raise FileNotFoundError("Route Not Found")
 
-    def check_url(self, url):
-        """
-        Check for the client URL conformity.
-
-        Raise exception or return None
-        """
-        parsed = urlparse(url, "gemini")
-
-        # Check for bad request
-        # Note: the URL will be cleaned before being used
-        if not parsed.path.endswith("\r\n"):
-            # TimeoutException will cause no response
-            raise TimeoutException
-        # Other than Gemini will trigger a PROXY ERROR
-        if parsed.scheme != "gemini":
-            raise ProxyRequestRefusedException
-        # You need to provide the right scheme
-        if not url.startswith("gemini://"):
-            # BadRequestException will return BadRequestResponse
-            raise BadRequestException
-        # URL max length is 1024.
-        if len(url.strip()) > 1024:
-            # BadRequestException will return BadRequestResponse
-            raise BadRequestException
-        # Not the right port
-        if ":" in parsed.netloc:
-            location, port = parsed.netloc.split(":")
-            if int(port) != self.port:
-                raise ProxyRequestRefusedException
-
     def exception_handling(self, exception, connection):
         """
         Handle exceptions and errors when the client is requesting a resource.
@@ -210,7 +212,7 @@ class App:
             # No response sent
             self.log("Connection reset by peer...", error=True)
         else:
-            self.log(f"Exception: {exception}", error=True)
+            self.log(f"Exception: {exception} / {type(exception)}", error=True)
 
         try:
             if response and connection:
@@ -248,7 +250,7 @@ class App:
                 url = connection.recv(2048).decode()
 
                 # Check URL conformity.
-                self.check_url(url)
+                check_url(url, self.port)
 
                 response = self.get_response(url)
                 connection.sendall(bytes(response))
