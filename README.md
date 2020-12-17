@@ -406,7 +406,7 @@ This project is mostly for education purposes, although it can possibly be used 
 
 ## What's in the name?
 
-*"Gémeaux"* is the French word for *"Gemini"*. And incidentally, I was born a Gemini.
+*"Gémeaux"* is the French word for *"Gemini"*. And incidentally, I was born a Gemini. In French it's pronounced \\ʒe.mo\\.
 
 *Disclaimer*: I don't believe in astrology.
 
