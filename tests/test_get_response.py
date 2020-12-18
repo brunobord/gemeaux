@@ -1,11 +1,13 @@
 from unittest.mock import patch
 
-from gemeaux import App, NotFoundResponse
+from gemeaux import App, NotFoundResponse, ZeroConfig
 
 
 @patch("ssl.SSLContext.load_cert_chain")
 def test_get_response_handler(mock_ssl_context, fake_handler, fake_response):
-    app = App(urls={"/handler": fake_handler, "/response": fake_response})
+    app = App(
+        urls={"/handler": fake_handler, "/response": fake_response}, config=ZeroConfig()
+    )
 
     # Just to make sure we're going through the get_route
     response = app.get_response("")
@@ -23,7 +25,7 @@ def test_get_response_handler(mock_ssl_context, fake_handler, fake_response):
 
 @patch("ssl.SSLContext.load_cert_chain")
 def test_get_response_exception(mock_ssl_context, fake_handler_exception):
-    app = App(urls={"": fake_handler_exception})
+    app = App(urls={"": fake_handler_exception}, config=ZeroConfig())
 
     response = app.get_response("")
     assert isinstance(response, NotFoundResponse)

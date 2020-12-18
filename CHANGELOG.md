@@ -10,6 +10,7 @@
 * Small refactor of basic classes, to force users to define their status code in derivative classes.
 * Added the phonetics of the word "gémeaux" in French.
 * Added nice badges to `README.md` file.
+* Change strategy for loading configuration / arguments. Easier testing and less naughty side-effects.
 
 ## v0.0.2 (2020-12-07)
 

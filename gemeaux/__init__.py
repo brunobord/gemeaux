@@ -36,7 +36,15 @@ from .responses import (
 __version__ = "0.0.3.dev0"
 
 
-class Config:
+class ZeroConfig:
+    ip = "localhost"
+    port = 1965
+    certfile = "cert.pem"
+    keyfile = "key.pem"
+    nb_connections = 5
+
+
+class ArgsConfig:
     def __init__(self):
 
         parser = ArgumentParser("Gemeaux: a Python Gemini server")
@@ -124,7 +132,7 @@ class App:
 ♊ Welcome to your Gémeaux server (v{__version__}) ♊
 """
 
-    def __init__(self, urls):
+    def __init__(self, urls, config=None):
         # Check the urls
         if not isinstance(urls, collections.Mapping):
             # Not of the dict type
@@ -140,6 +148,7 @@ class App:
                 raise ImproperlyConfigured(msg)
 
         self.urls = urls
+        self.config = config or ArgsConfig()
 
     def log(self, message, error=False):
         """
@@ -275,17 +284,18 @@ class App:
         Launch the server
         """
         # Loading config only at runtime, not initialization
-        config = Config()
-        self.port = config.port
+        self.port = self.config.port
         context = SSLContext(PROTOCOL_TLS_SERVER)
-        context.load_cert_chain(config.certfile, config.keyfile)
+        context.load_cert_chain(self.config.certfile, self.config.keyfile)
 
         with socket(AF_INET, SOCK_STREAM) as server:
-            server.bind((config.ip, config.port))
-            server.listen(config.nb_connections)
+            server.bind((self.config.ip, self.config.port))
+            server.listen(self.config.nb_connections)
             print(self.BANNER)
             with context.wrap_socket(server, server_side=True) as tls:
-                print(f"Application started…, listening to {config.ip}:{config.port}")
+                print(
+                    f"Application started…, listening to {self.config.ip}:{self.config.port}"
+                )
                 self.mainloop(tls)
 
 
