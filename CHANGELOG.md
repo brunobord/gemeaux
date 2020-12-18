@@ -9,6 +9,7 @@
 * Added documentation about the available `Response` classes.
 * Small refactor of basic classes, to force users to define their status code in derivative classes.
 * Added the phonetics of the word "gémeaux" in French.
+* Added nice badges to `README.md` file.
 
 ## v0.0.2 (2020-12-07)
 
