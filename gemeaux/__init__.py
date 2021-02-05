@@ -3,7 +3,7 @@ import ssl
 import sys
 import time
 from argparse import ArgumentParser
-from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
+from socket import AF_INET, SO_REUSEADDR, SOCK_STREAM, SOL_SOCKET, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
 from urllib.parse import urlparse
 
