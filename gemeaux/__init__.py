@@ -3,7 +3,7 @@ import ssl
 import sys
 import time
 from argparse import ArgumentParser
-from socket import AF_INET, SOCK_STREAM, socket
+from socket import AF_INET, SO_REUSEADDR, SOCK_STREAM, SOL_SOCKET, socket
 from ssl import PROTOCOL_TLS_SERVER, SSLContext
 from urllib.parse import urlparse
 
@@ -289,6 +289,7 @@ class App:
         context.load_cert_chain(self.config.certfile, self.config.keyfile)
 
         with socket(AF_INET, SOCK_STREAM) as server:
+            server.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
             server.bind((self.config.ip, self.config.port))
             server.listen(self.config.nb_connections)
             print(self.BANNER)

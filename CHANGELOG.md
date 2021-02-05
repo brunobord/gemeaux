@@ -14,6 +14,7 @@
 * Fixed the collections import in main file so its code is future-proof. Thanks @JonStratton (#13)
 * Removed support of Python 3.6 and 3.7.
 * Switched from Travis CI to Github Workflows
+* Added the option SO_REUSEADDR to the severs socket. Thanks @airmack (#11)
 
 ## v0.0.2 (2020-12-07)
 
