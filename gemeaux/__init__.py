@@ -236,7 +236,8 @@ class App:
         try:
             k_url, k_value = self.get_route(path)
             if isinstance(k_value, Handler):
-                return k_value.handle(k_url, path)
+                query = urlparse(url).query
+                return k_value.handle(k_url, path, query)
             elif isinstance(k_value, Response):
                 return k_value
         except TemplateError as exc:

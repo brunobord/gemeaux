@@ -16,7 +16,7 @@ class Handler:
     def get_response(self, *args, **kwargs):
         raise NotImplementedError
 
-    def handle(self, url, path):
+    def handle(self, url, path, query):
         """
         Handle the request to return the appropriate response.
 
