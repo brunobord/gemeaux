@@ -11,6 +11,7 @@
 * Added the phonetics of the word "gémeaux" in French.
 * Added nice badges to `README.md` file.
 * Change strategy for loading configuration / arguments. Easier testing and less naughty side-effects.
+* Fixed the collections import in main file so its code is future-proof. Thanks @JonStratton (#13)
 
 ## v0.0.2 (2020-12-07)
 
