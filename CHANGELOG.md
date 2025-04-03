@@ -12,6 +12,8 @@
 * Added nice badges to `README.md` file.
 * Change strategy for loading configuration / arguments. Easier testing and less naughty side-effects.
 * Fixed the collections import in main file so its code is future-proof. Thanks @JonStratton (#13)
+* Removed support of Python 3.6 and 3.7.
+* Switched from Travis CI to Github Workflows
 
 ## v0.0.2 (2020-12-07)
 

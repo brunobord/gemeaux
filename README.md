@@ -1,6 +1,6 @@
 # Gemeaux: a Python Gemini Server
 
-![travis build badge for "main" branch](https://travis-ci.com/brunobord/gemeaux.svg?branch=main) [![PyPI version of gemeaux](https://badge.fury.io/py/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI license](https://img.shields.io/pypi/l/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/)
+[![PyPI version of gemeaux](https://badge.fury.io/py/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI license](https://img.shields.io/pypi/l/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/)
 
 The [Gemini protocol](https://gemini.circumlunar.space/) is an ongoing initiative to build a clutter-free content-focused Internet browsing, *à la* [Gopher](https://en.wikipedia.org/wiki/Gopher_(protocol)), but modernized. It focuses on Privacy (TLS + no user tracking) and eliminates the fluff around the modern web: cookies, ads, overweight Javascript apps, browser incompatibilities, etc.
 
@@ -23,9 +23,9 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 
 ## Requirements
 
-`Gemeaux` is built around **the standard Python 3.6+ library** and syntax. There are **no external dependencies**.
+`Gemeaux` is built around **the standard Python 3.8+ library** and syntax. There are **no external dependencies**.
 
-Automated tests are launched using Python 3.6, 3.7, 3.8 and 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
+Automated tests are launched using Python 3.8 and 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
 
 You'll also need `openssl` to generate certificates.
 
@@ -397,7 +397,7 @@ You can pass as many context variables as you want, but here are some important 
 
 This project is mostly for education purposes, although it can possibly be used through a local network, serving Gemini content. There are important steps & bugs to fix before becoming a more solid alternative to other Gemini server software.
 
-* The internals of `Gemeaux` are being tested on Python3.6+, but not the mainloop mechanics.
+* The internals of `Gemeaux` are being tested on Python3.8+, but not the mainloop mechanics.
 * The vast majority of Gemini Standard responses are not implemented.
 * The Response documentation is missing, along with docstrings.
 * Performances are probably very low, there might be room for optimisation.
