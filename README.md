@@ -27,7 +27,7 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 
 `Gemeaux` is built around **the standard Python 3.9+ library** and syntax. There are **no external dependencies**.
 
-Automated tests are launched using Python 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
+Automated tests are launched using Python 3.9, 3.10, 3.11, 3.12 and 3.13 so the internals of `Gemeaux` are safe with these versions of Python.
 
 You'll also need `openssl` to generate certificates.
 

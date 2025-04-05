@@ -17,6 +17,7 @@
 * Added the option SO_REUSEADDR to the severs socket. Thanks @airmack (#11)
 * Drop support for Python 3.8
 * Added a small badge for GH workflows
+* Confirm support of Python 3.10, 3.11, 3.12, 3.13
 
 ## v0.0.2 (2020-12-07)
 
