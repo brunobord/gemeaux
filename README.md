@@ -23,9 +23,9 @@ For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a
 
 ## Requirements
 
-`Gemeaux` is built around **the standard Python 3.8+ library** and syntax. There are **no external dependencies**.
+`Gemeaux` is built around **the standard Python 3.9+ library** and syntax. There are **no external dependencies**.
 
-Automated tests are launched using Python 3.8 and 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
+Automated tests are launched using Python 3.9, so the internals of `Gemeaux` are safe with these versions of Python.
 
 You'll also need `openssl` to generate certificates.
 
@@ -397,7 +397,7 @@ You can pass as many context variables as you want, but here are some important 
 
 This project is mostly for education purposes, although it can possibly be used through a local network, serving Gemini content. There are important steps & bugs to fix before becoming a more solid alternative to other Gemini server software.
 
-* The internals of `Gemeaux` are being tested on Python3.8+, but not the mainloop mechanics.
+* The internals of `Gemeaux` are being tested on Python3.9+, but not the mainloop mechanics.
 * The vast majority of Gemini Standard responses are not implemented.
 * The Response documentation is missing, along with docstrings.
 * Performances are probably very low, there might be room for optimisation.

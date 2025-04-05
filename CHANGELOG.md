@@ -15,6 +15,7 @@
 * Removed support of Python 3.6 and 3.7.
 * Switched from Travis CI to Github Workflows
 * Added the option SO_REUSEADDR to the severs socket. Thanks @airmack (#11)
+* Drop support for Python 3.8
 
 ## v0.0.2 (2020-12-07)
 
