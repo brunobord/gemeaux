@@ -16,6 +16,7 @@
 * Switched from Travis CI to Github Workflows
 * Added the option SO_REUSEADDR to the severs socket. Thanks @airmack (#11)
 * Drop support for Python 3.8
+* Added a small badge for GH workflows
 
 ## v0.0.2 (2020-12-07)
 

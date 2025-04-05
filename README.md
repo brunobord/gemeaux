@@ -1,5 +1,7 @@
 # Gemeaux: a Python Gemini Server
 
+![Python tests](https://github.com/brunobord/gemeaux/actions/workflows/tox-tests.yaml/badge.svg)
+
 [![PyPI version of gemeaux](https://badge.fury.io/py/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI license](https://img.shields.io/pypi/l/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/gemeaux.svg)](https://pypi.python.org/pypi/gemeaux/)
 
 The [Gemini protocol](https://gemini.circumlunar.space/) is an ongoing initiative to build a clutter-free content-focused Internet browsing, *à la* [Gopher](https://en.wikipedia.org/wiki/Gopher_(protocol)), but modernized. It focuses on Privacy (TLS + no user tracking) and eliminates the fluff around the modern web: cookies, ads, overweight Javascript apps, browser incompatibilities, etc.
