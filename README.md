@@ -16,12 +16,12 @@ So, here it is: the `Gemeaux` server.
 
 A quick word about Gemini protocol. Since it's a different protocol from HTTP, or Gopher, or FTP, etc., it means that you'll have to drop your beloved Web Browser to access Gemini content. Hopefully, several clients are available.
 
-* [A list of clients on the canonical Gemini Space](https://gemini.circumlunar.space/clients.html)
+* [A list of clients on the canonical Gemini Space](https://geminiprotocol.net/clients.html)
 * [A curated list of clients on "awesome Gemini"](https://github.com/kr1sp1n/awesome-gemini#clients)
 
 Download and install a couple of clients, pick one that fits your needs, or if you feel like it, build one yourself, and you'll be ready to spacewalk the Gemini ecosystem.
 
-For development purposes, I'd recommend [bollux](https://sr.ht/~acdw/bollux/), a browser made for bash, because it displays helpful debug messages (and it's as fast as you can dream).
+For development purposes, I'd recommend [bollux](https://tildegit.org/acdw/bollux), a browser made for bash, because it displays helpful debug messages (and it's as fast as you can dream).
 
 ## Requirements
 

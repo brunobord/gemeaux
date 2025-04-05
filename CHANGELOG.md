@@ -18,6 +18,7 @@
 * Drop support for Python 3.8
 * Added a small badge for GH workflows
 * Confirm support of Python 3.10, 3.11, 3.12, 3.13
+* Updating links to the Gemini Protocol canonical website and Bollux project page on the README
 
 ## v0.0.2 (2020-12-07)
 
