@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 import ssl
 import sys
 import time
@@ -134,7 +134,7 @@ class App:
 
     def __init__(self, urls, config=None):
         # Check the urls
-        if not isinstance(urls, collections.Mapping):
+        if not isinstance(urls, collections.abc.Mapping):
             # Not of the dict type
             raise ImproperlyConfigured("Bad url configuration: not a dict or dict-like")
 
