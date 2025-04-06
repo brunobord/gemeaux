@@ -1,5 +1,9 @@
 # Gemeaux changelog
 
+## master (unreleased)
+
+Nothing here yet.
+
 ## v0.0.3 (2025-04-06)
 
 ### Features
