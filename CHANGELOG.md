@@ -1,25 +1,31 @@
 # Gemeaux changelog
 
-## master (unreleased)
+## v0.0.3 (2025-04-06)
 
-* Confirmed Python 3.9 support.
-* Added `BadRequestResponse` and `ProxyRequestRefusedResponse` to the example application.
-* Fix InputResponse handling when transmitting the answer to the prompt.
+### Features
+
+* Fix `InputResponse` handling when transmitting the answer to the prompt.
 * Added unittests to the `check_url` function.
-* Added documentation about the available `Response` classes.
 * Small refactor of basic classes, to force users to define their status code in derivative classes.
+* Change strategy for loading configuration / arguments. Easier testing and less naughty side-effects.
+
+### Maintenance
+
+* [BREAKING CHANGE] Removed support of Python 3.6, 3.7 and 3.8.
+* Confirm support of Python 3.9, 3.10, 3.11, 3.12, 3.13
+* Fixed the collections import in main file so its code is future-proof. Thanks @JonStratton (#13)
+* Switched from Travis CI to Github Workflows
+* Added the option `SO_REUSEADDR` to the severs socket. Thanks @airmack (#11)
+* Switch from `setup.cfg` to `pyproject.toml`, as all cool kids do (#20).
+
+### Documentation
+
+* Added `BadRequestResponse` and `ProxyRequestRefusedResponse` to the example application.
+* Added documentation about the available `Response` classes.
 * Added the phonetics of the word "gémeaux" in French.
 * Added nice badges to `README.md` file.
-* Change strategy for loading configuration / arguments. Easier testing and less naughty side-effects.
-* Fixed the collections import in main file so its code is future-proof. Thanks @JonStratton (#13)
-* Removed support of Python 3.6 and 3.7.
-* Switched from Travis CI to Github Workflows
-* Added the option SO_REUSEADDR to the severs socket. Thanks @airmack (#11)
-* Drop support for Python 3.8
 * Added a small badge for GH workflows
-* Confirm support of Python 3.10, 3.11, 3.12, 3.13
 * Updating links to the Gemini Protocol canonical website and Bollux project page on the README
-* Switch from setup.cfg to pyproject.toml, as all cool kids do (#20).
 
 ## v0.0.2 (2020-12-07)
 
