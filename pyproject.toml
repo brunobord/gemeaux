@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gemeaux"
+dynamic = ["version"]
+description = "A Python Gemini server"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [
+    { name = "Bruno Bord", email = "bruno@jehaisleprintemps.net" },
+]
+keywords = [
+    "gemini",
+    "protocol",
+    "server",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+homepage = "https://github.com/brunobord/gemeaux"
+
+[tool.hatch.version]
+path = "gemeaux/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/gemeaux",
+]
